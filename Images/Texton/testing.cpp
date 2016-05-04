@@ -12,49 +12,35 @@
 using namespace cv;
 using namespace std;
 
-void smooth_filter( Mat image_src, Mat &img_padded ){
+void smooth_filter( Mat &image_src, Mat &img_padded ){
 
-    int image_width = image_src.cols;
-    int image_height = image_src.rows;
-
-    //cout << "dimensions of padded " << img_padded.rows << "\t" << img_padded.cols << endl;    
+    // int image_width = image_src.cols;
+    // int image_height = image_src.rows;
 
     //resizing image
-    resize( img_padded, img_padded, Size(), (double)(image_width + 2) /image_width , (double)(image_height + 2)/image_height , INTER_LINEAR );
+    // resize( img_padded, img_padded, Size(), (double)(image_width + 2) /image_width , (double)(image_height + 2)/image_height , INTER_LINEAR );
 
-/*  //To use gauss function
-    //constant epsilon 
-    const double eps = 2.2204e-16;
-    cout << eps << endl;
-*/
-    //cout << "dimensions of padded " << img_padded.rows << "\t" << img_padded.cols << endl;
+    // int counter = 0;
+    // for( int i = 0 ; i < img_padded.rows ; ++i ){
+    // 	for (int j = 0; j < img_padded.cols ; ++j){
+    // 		counter+= (int)img_padded.at<uchar>(i,j);
+    // 	}
+    // }
 
-    int counter = 0;
-    for( int i = 0 ; i < img_padded.rows ; ++i ){
-    	for (int j = 0; j < img_padded.cols ; ++j){
-    		counter+= (int)img_padded.at<uchar>(i,j);
-    	}
-    }
-
-
-    double T = counter/(img_padded.rows*img_padded.cols);
+    // double T = counter/(img_padded.rows*img_padded.cols);
+    int T = 0;
 
     //Aplying filter
-    for( int i = 1; i < (img_padded.rows - 1); i+=2 ){
-        for( int j = 1; j < (img_padded.cols - 1); j+=2 ){
+    for( int i = 0; i < (img_padded.rows - 1); i+=2 ){
+        for( int j = 0; j < (img_padded.cols - 1); j+=2 ){
   
-            //cout << (int)img_padded.at<uchar>(i,j) << "\t";
-            // img_padded.at<uchar>(i,j)   = (img_padded.at<uchar>(i-1,j-1) * 1/9 ) + (img_padded.at<uchar>(i-1,j) * 1/9 ) + 
-            //                               (img_padded.at<uchar>(i-1,j+1) * 1/9 ) + (img_padded.at<uchar>(i,j-1) * 1/9 ) +
-            //                               (img_padded.at<uchar>(i  ,j  ) * 1/9 ) + (img_padded.at<uchar>(i,j+1) * 1/9 ) +
-            //                               (img_padded.at<uchar>(i+1,j-1) * 1/9 ) + (img_padded.at<uchar>(i+1,j) * 1/9 ) +
-            //                               (img_padded.at<uchar>(i+1,j+1) * 1/9 ); 
-
-            if( img_padded.at<uchar>(i,j) > T && img_padded.at<uchar>(i+1,j) > T && img_padded.at<uchar>(i+1,j+1) > T ){
+            if( img_padded.at<uchar>(i,j) > T && 
+                img_padded.at<uchar>(i+1,j) > T 
+                && img_padded.at<uchar>(i+1,j+1) > T ){
             	
-            	img_padded.at<uchar>(i,j) = T;
-            	img_padded.at<uchar>(i,j+1) = T;
-            	img_padded.at<uchar>(i+1,j+1) = T;
+            	img_padded.at<uchar>(i,j) = 255;
+            	img_padded.at<uchar>(i,j+1) = 255;
+            	img_padded.at<uchar>(i+1,j+1) = 255;
 
             	img_padded.at<uchar>(i+1,j) = 0;
             }
@@ -65,32 +51,38 @@ void smooth_filter( Mat image_src, Mat &img_padded ){
             	img_padded.at<uchar>(i+1,j) = 0;
             }
 
-/*          Using mask of second derivative
-            img_padded.at<uchar>(i,j)   = (img_padded.at<uchar>(i-1,j-1) * 0 ) + (img_padded.at<uchar>(i-1,j) * 1 ) + 
-                                          (img_padded.at<uchar>(i-1,j+1) * 0 ) + (img_padded.at<uchar>(i,j-1) * 1 ) +
-                                          (img_padded.at<uchar>(i  ,j  ) * -4 ) + (img_padded.at<uchar>(i,j+1) * 1 ) +
-                                          (img_padded.at<uchar>(i+1,j-1) * 0 ) + (img_padded.at<uchar>(i+1,j) * 1 ) +
-                                          (img_padded.at<uchar>(i+1,j+1) * 0 ); 
-*/
-            //cout << (int)img_padded.at<uchar>(i,j) << "\n";
         } 
     }
+
+
+    for( int i = 0 ; i < image_src.rows ; ++i ){
+        for( int j = 0 ; j < image_src.rows ; ++j ){
+            if( img_padded.at<uchar>(i,j) == 0 ){
+                image_src.at<Vec3b>(i,j) = Vec3b( 0,0,0 );
+            }
+        }
+    }
+
+
+
 }
 
 int main(int argc, char** argv ){
 
-	Mat image_src = imread( argv[1] , 0 ); // 0, grayscale  >0, color
+	Mat image_src = imread( argv[1] , 1 ); // 0, grayscale  >0, color
 	Mat img_padded = imread( argv[1] , 0 ); // 0, grayscale  >0, color
+
+    Mat img_bw = img_padded > 128;
 
 	string name (argv[1]);
 
-	smooth_filter( image_src, img_padded );
+	smooth_filter( image_src, img_bw );
 
-	imwrite( name + "mod.jpg" , img_padded);
+	imwrite( name + "bw.jpg" , img_bw);
 
-	imshow("HOLA", img_padded);
+	// imshow("HOLA", img_bw);
 
-
+    imwrite( name + "mod.jpg" , image_src);
 
 	cvWaitKey(0);
 
