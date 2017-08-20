@@ -99,7 +99,7 @@ void init( vector<vector<T>>& xij, T value ){
     }    
 }
 
-int main(int argc, char const *argv[]){
+void testing_functions(){
 
 	vector<double> params;
 	reading_params(params);
@@ -123,6 +123,12 @@ int main(int argc, char const *argv[]){
 
 	//testing matrix print 
 	print( "params:\n", Xij );
+
+}
+
+int main(int argc, char const *argv[]){
+
+	testing_functions();
 
 	return 0;
 }
