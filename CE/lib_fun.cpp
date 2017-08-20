@@ -76,6 +76,11 @@ void print( string title, vector<T> & Q_t, int spc, ofstream & os ){
     
 }
 
+template<typename T>
+void create_matrix( vector<vector<T>>& xij, int rows, int cols ){
+	vector< vector<double> > Xij ( rows, vector<double>(cols) );
+}
+
 int main(int argc, char const *argv[]){
 
 	vector<double> params;
@@ -87,6 +92,12 @@ int main(int argc, char const *argv[]){
 	//testing print file
 	ofstream out_lib_fun("out_lib_fun.txt",ofstream::app);
 	print("params:\n",params,8,out_lib_fun);
+
+	//testing creation of matrix
+	vector<vector<double>> Xij;
+	create_matrix(Xij,2,3);
+
+	print( "params:\n", Xij );
 
 	return 0;
 }
