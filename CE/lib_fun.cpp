@@ -79,6 +79,24 @@ void print( string title, vector<T> & Q_t, int spc, ofstream & os ){
 template<typename T>
 void create_matrix( vector<vector<T>>& xij, int rows, int cols ){
 	vector< vector<double> > Xij ( rows, vector<double>(cols) );
+	xij = Xij;
+}
+
+template<typename T>
+void init( vector<T> & xij, T value ){
+    for( int i = 0 ; i < xij.size(); ++i){
+    	xij[i] = value;
+    }    
+}
+
+template<typename T>
+void init( vector<vector<T>>& xij, T value ){
+	cout << xij.size() << "\t" << xij[0].size() << endl;
+    for( int i = 0 ; i < xij.size(); ++i){
+    	for( int j = 0 ; j < xij[0].size() ; ++j){
+    		xij[i][j] = value;
+    	}
+    }    
 }
 
 int main(int argc, char const *argv[]){
@@ -97,6 +115,13 @@ int main(int argc, char const *argv[]){
 	vector<vector<double>> Xij;
 	create_matrix(Xij,2,3);
 
+	//testing matrix print 
+	print( "params:\n", Xij );
+
+	//testing initialization
+	init(Xij,3.0);
+
+	//testing matrix print 
 	print( "params:\n", Xij );
 
 	return 0;
