@@ -44,6 +44,7 @@ void print( string title, vector< vector<T> >& Q_t ){
 		cout << endl;
 	}
 }
+
 template<typename T>
 void print( string title, vector<T> & Q_t, int type = 0){
 	cout << title << endl ;
@@ -63,13 +64,29 @@ void print( string title, vector<T> & Q_t, int type = 0){
 	
 }
 
+template<typename T>
+void print( string title, vector<T> & Q_t, int spc, ofstream & os ){
+    os << title << endl ;
+    // int spc = 10;
+    for( int i = 0 ; i < Q_t.size(); ++i){
+        // cout << setw(spc) << i << setw(spc) << Q_t[i] << endl;
+        os << setw(spc) << Q_t[i] ;
+    }    
+    os << endl;
+    
+}
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]){
 
 	vector<double> params;
 	reading_params(params);
+
+	//testing print vector
 	print("params:\n",params,1);
+
+	//testing print file
+	ofstream out_lib_fun("out_lib_fun.txt",ofstream::app);
+	print("params:\n",params,8,out_lib_fun);
 
 	return 0;
 }
