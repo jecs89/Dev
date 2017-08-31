@@ -82,6 +82,9 @@ int main(int argc, char const *argv[]){
 
 	vector<double> z( n_hidden );
 
+	int n_out = 1;
+	vector<double> y( n_out );
+
 
 	while( iter < maxIter ){
 		cout << "Iteration " << iter << endl;
@@ -102,6 +105,19 @@ int main(int argc, char const *argv[]){
 
 	 			cout << z[i_z] << endl;
 	 		}
+
+	 		//Sum for outputs neurons
+	 		for( int i_o = 0 ; i_o < y.size() ; i_o++ ){
+	 			cout << "o neuron " << i_o << endl;
+	 			y[i_o] = 0;
+	 			for( int i_h = 0 ; i_h < z.size() ; i_h++ ){
+	 				y[i_o] += z[i_h]*W[i_h][1];
+	 			}
+	 			y[i_o] += 1.0*W[2][1];
+
+	 			cout << y[i_o] << endl;
+	 		}
+
 
 
 
