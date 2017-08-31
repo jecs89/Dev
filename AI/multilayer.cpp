@@ -160,7 +160,16 @@ int main(int argc, char const *argv[]){
 	 			cout << y[i_o] << endl;
 	 		}
 
+	 		cout << "Error\n";
 
+	 		double total_error = 0;
+
+	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
+	 			cout << pattern[i][k] << "*" << y[i_o] << "=";
+	 			total_error += error2(pattern[i][k],y[i_o]);
+	 			cout << error2(pattern[i][k],y[i_o]) << endl;
+	 		}
+	 		cout << total_error << endl;
 
 
 	// 		//cout << "sum: " << sum << "vs" << pattern[i][2] << endl;
