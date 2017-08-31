@@ -28,6 +28,11 @@ double my_sum( double x_1, double x_2, double bias, double y, vector<vector<doub
 	return sgn( val );
 }
 
+double error2(double x, double y){
+	return (x-y)*(x-y)*0.5;
+
+}
+
 
 int main(int argc, char const *argv[]){
 	
