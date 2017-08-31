@@ -31,9 +31,9 @@ double my_sum( double x_1, double x_2, double bias, double y, vector<vector<doub
 
 int main(int argc, char const *argv[]){
 	
-	string name;
+	/*string name;
 	cin >> name;
-
+*/
 	vector<double> params(2);
 	vector<vector<double>> patterns;
 
@@ -75,7 +75,7 @@ int main(int argc, char const *argv[]){
 
 	double sum = 0.0;
 
-	int maxIter = 2;
+	int maxIter = 1;
 	int iter = 0;
 
 	int n_hidden = 3;
@@ -87,9 +87,24 @@ int main(int argc, char const *argv[]){
 		cout << "Iteration " << iter << endl;
 
 	 	for (int i = 0; i < 4; ++i){
-	 		//cout << "pattern " << i << endl;
+	 		cout << "pattern " << i << endl;
 
 	 		//sum = my_sum( pattern[i][0], pattern[i][1], bias, pattern[i][2], W_1 );
+
+	 		//Sum for hidden neurons
+	 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
+	 			cout << "h neuron " << i_z << endl;
+	 			z[i_z] = 0;
+	 			for( int i_p = 0 ; i_p < 2 ; i_p++ ){
+	 				z[i_z] += pattern[i][i_p]*W[i_z][0];
+	 			}
+	 			z[i_z] += 1.0*W[2][0];
+
+	 			cout << z[i_z] << endl;
+	 		}
+
+
+
 	// 		//cout << "sum: " << sum << "vs" << pattern[i][2] << endl;
 
 	// 		double my_error;
