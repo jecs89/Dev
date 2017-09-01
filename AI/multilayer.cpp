@@ -22,6 +22,14 @@ double sigmoid(double a){
 	return 1.0/( 1.0 + exp(-a) );
 }
 
+vector<double> vsigmoid(vector<double> a){
+	vector<double> y(a.size());
+	for (int i = 0; i < y.size(); ++i){
+		y[i] = sigmoid(y[i]);
+	}
+	return y;
+}
+
 double my_sum( double x_1, double x_2, double bias, double y, vector<vector<double>> w ){
 	double val = x_1 * w[0][0] + x_2 * w[1][0] + bias * w[2][0];
 //	cout << val << endl;
@@ -129,15 +137,16 @@ int main(int argc, char const *argv[]){
 
 	 			for( int i_p = 0 ; i_p < D ; i_p++  ){
 	 				z[i_z] += pattern[i][i_p]*W[i_w][0];
-	 				cout << pattern[i][i_p] << "*" << W[i_w][0] << "=" << pattern[i][i_p]*W[i_w][0] << endl;
+	 				//cout << "\tw " << i_w+1 << " " << pattern[i][i_p] << "*" << W[i_w][0] << "=" << pattern[i][i_p]*W[i_w][0] << endl;
 	 				i_w++;
 	 			}
 	 			z[i_z] += 1.0*W[4][0];
+	 			//cout << 1.0*W[4][0] << endl;
 
 	 			i_w = D;
 	 			i_w_lim = (i_z+2)*D;
 
-	 			cout << z[i_z] << "\t" << sigmoid(z[i_z]) << endl;
+	 			cout << "\tz " << z[i_z] << "\t sig " << sigmoid(z[i_z]) << endl;
 	 		}
 
 	 		i_w = 0;
@@ -149,15 +158,16 @@ int main(int argc, char const *argv[]){
 	 			y[i_o] = 0;
 	 			for( int i_h = 0 ; i_h < z.size() ; i_h++ ){
 	 				y[i_o] += sigmoid(z[i_h])*W[i_w][1];
-	 				cout << sigmoid(z[i_h]) << "*" << W[i_w][1] << "=" << sigmoid(z[i_h])*W[i_w][1] << endl;
+	 				//cout << "\tw " << i_w+1 << " " << sigmoid(z[i_h]) << "*" << W[i_w][1] << "=" << sigmoid(z[i_h])*W[i_w][1] << endl;
 	 				i_w++;
 	 			}
 	 			y[i_o] += 1.0*W[4][1];
+	 			//cout << 1.0*W[4][1] << endl;
 
 	 			i_w = D;
 	 			i_w_lim = (i_o+2)*n_hidden;
 
-	 			cout << y[i_o] << endl;
+	 			cout << "\tz " << y[i_o] << "\t sig " << sigmoid(y[i_o]) << endl;
 	 		}
 
 	 		cout << "Error\n";
@@ -165,78 +175,55 @@ int main(int argc, char const *argv[]){
 	 		double total_error = 0;
 	 		int k;
 	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
-	 			cout << pattern[i][k] << "*" << y[i_o] << "=";
-	 			total_error += error2(pattern[i][k],y[i_o]);
-	 			cout << error2(pattern[i][k],y[i_o]) << endl;
+	 			//cout << pattern[i][k] << "*" << sigmoid(y[i_o]) << "=";
+	 			total_error += error2( pattern[i][k], sigmoid(y[i_o]));
+	 			//cout << error2(pattern[i][k],sigmoid(y[i_o])) << endl;
 	 		}
-	 		cout << total_error << endl;
+	 		//cout << total_error << endl;
+
+	 		print("W\n",W);
+	 		print("Z:\t", z);
+	 		//print("Y:\t", vsigmoid(y));
 
 	 		//Updating W from Z--O
 	 		cout << "Updating\n";
 
-
-
+	 		i_w = 0;
 	 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
-	 			cout << "o neuron " << i_z << endl;
-	 			//z[i_z] = 0;
+	 			cout << "o neuron " << i_z+1 << endl;
 
 		 		double delta_w = 1.0;
 				for( int i_o = 0; i_o < y.size() ; i_o++ ){
-		 			cout << "h neuron " << i_o << endl;
+					cout << i_o << endl;
+		 			cout << "w " << i_w+1 << endl;
 
-		 			double sig_y = sigmoid(y[i_z]);
-		 			delta_w = sig_y - pattern[i][D+i_o];
+		 			double sig_y = sigmoid(y[i_o]);
+		 			//delta_w = sig_y - pattern[i][D+i_o];
 
-		 			cout << "p1 " << delta_w << endl;
+		 			cout << "p1 = " << sig_y << " - " << pattern[i][D+i_z] << "=" << sig_y - pattern[i][D+i_z] << endl;
 
-		 			double tmp_y = sigmoid(y[i_z]);
+		 			double tmp_y = sigmoid(z[i_o]);
 
-		 			cout << "p2 " << tmp_y *(1 - tmp_y) << endl;
+		 			cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
+		 			cout << "p3 " << sigmoid(z[i_o]) << endl;
 
-		 			cout << "p3 " << sigmoid(z[i_z]) << endl;
+		 			//cout << setw(10) << "p1" << setw(10) << "p2" << setw(10) << "p3" << endl; 
+		 			//cout << setw(10) << delta_w << setw(10) << sig_y *(1 - sig_y) << setw(10) << tmp_y << endl; 
 
-		 			delta_w = delta_w * tmp_y *(1 - tmp_y) * sigmoid(z[i_z]) ;
 
-		 			cout << delta_w << endl;
+		 			delta_w = (sig_y - pattern[i][D+i_z]) * sig_y *(1 - sig_y) * tmp_y ;
 
-		 			z[i_z] = W[i_z][1] - 0.5 * delta_w;
-		 			cout << W[i_z][1] << "-" << "0.5 * "<< delta_w << endl;
+		 			cout << "\t" << delta_w << endl;
 
-	 				cout << "upd " << z[i_z] << endl;
+		 			cout << "\t" << W[i_w][1] << "-" << "0.5 * "<< delta_w << endl;
+
+		 			W[i_w][1] = W[i_w][1] - 0.5 * delta_w;
+
+	 				cout << "\t" << "upd " << W[i_w][1] << endl;
+
+	 				i_w++;
 		 		}
 	 		}
-
-
-	 		/*
-	 		double delta_w = 1.0;
-			for( int i_o = 0, k = D ; i_o < y.size() ; i_o++, k++ ){
-	 			cout << "o neuron " << i_o << endl;
-
-	 			double sig_y = sigmoid(y[i_o]);
-	 			delta_w = sig_y - pattern[i][k];
-	 			//cout << sigmoid(y[i_o]) << "-" << pattern[i][k] << endl;
-	 			//cout << delta_w << endl;
-	 			//cout << sig_y*(1-sig_y) << endl;
-	 			//cout << sigmoid(z[i_o]) << endl;
-
-	 			delta_w = sig_y*(1-sig_y) * sigmoid(z[i_o]) * delta_w;
-
-	 			cout << delta_w << endl;
-
-	 		}*/
-
-
-	// 		//cout << "sum: " << sum << "vs" << pattern[i][2] << endl;
-
-	// 		double my_error;
-	// 		if( sum != pattern[i][2] ){
-	// 			my_error = ( pattern[i][2] - sum );
-	// 			//cout << "--" << my_error << endl;
-	// 			W_1[0][0] = W_1[0][0] + n * pattern[i][0] * my_error;
-	// 			W_1[1][0] = W_1[1][0] + n * pattern[i][1] * my_error;
-	// 			W_1[2][0] = W_1[2][0] + n * bias * my_error;
-	// 		}
-	// 		//cout << "weigths " << setw(10) << W_1[0][0] << setw(10) << W_1[1][0] << setw(10) << W_1[2][0] << setw(4) << my_error << endl;
 	 	}
 		iter++;
 	}
