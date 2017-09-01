@@ -122,6 +122,15 @@ int main(int argc, char const *argv[]){
 	vector<double> f_y( n_out );
 
 
+	vector<vector<double>> upd_W ( 5, vector<double>(2));
+
+	for (int i = 0; i < upd_W.size() ; ++i){
+		for (int j = 0; j < upd_W[0].size() ; ++j){
+			upd_W[i][j] = W[i][j];
+		}
+	}
+
+
 
 	while( iter < maxIter ){
 		cout << "Iteration " << iter << endl;
@@ -191,51 +200,137 @@ int main(int argc, char const *argv[]){
 
 	 		print("W\n",W);
 	 		print("Z:\t", z);
-	 		//print("Y:\t", vsigmoid(y));
+	 		print("f(z):\t", f_z);
+	 		print("Y:\t", y);
+	 		print("f(y):\t", f_y);
 
 	 		//Updating W from Z--O
 	 		cout << "Updating\n";
-
+	 		cout << "Output Layer\n";
 	 		i_w = 0;
+
+
+	 		//why the second index of pattern is [D+i_z]????
+	 		//is it limited for hidden neurons????
+	 		// the number of weights is H*O
 	 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
-	 			cout << "o neuron " << i_z+1 << endl;
+	 			//cout << "o neuron " << i_z+1 << endl;
 
 		 		double delta_w = 1.0;
 				for( int i_o = 0; i_o < y.size() ; i_o++ ){
-					cout << i_o << endl;
-		 			cout << "w " << i_w+1 << endl;
+					//cout << i_o << endl;
+		 			//cout << "w " << i_w+1 << endl;
 
 		 			double sig_y = f_y[i_o];
-		 			//delta_w = sig_y - pattern[i][D+i_o];
 
-		 			cout << "p1 = " << sig_y << " - " << pattern[i][D+i_z] << "=" << sig_y - pattern[i][D+i_z] << endl;
+		 			//cout << "p1 = " << sig_y << " - " << pattern[i][D+i_z] << "=" << sig_y - pattern[i][D+i_z] << endl;
 
 		 			double tmp_y = f_z[i_o];
 
-		 			cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
-		 			cout << "p3 " << f_z[i_o] << endl;
+		 			//cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
+		 			//cout << "p3 " << f_z[i_o] << endl;
 
-		 			//cout << setw(10) << "p1" << setw(10) << "p2" << setw(10) << "p3" << endl; 
-		 			//cout << setw(10) << delta_w << setw(10) << sig_y *(1 - sig_y) << setw(10) << tmp_y << endl; 
-
+		 			///cout << setw(10) << "p1" << setw(10) << "p2" << setw(10) << "p3" << endl; 
+		 			///cout << setw(10) << delta_w << setw(10) << sig_y *(1 - sig_y) << setw(10) << tmp_y << endl; 
 
 		 			delta_w = (sig_y - pattern[i][D+i_z]) * sig_y *(1 - sig_y) * tmp_y ;
 
-		 			cout << "\t" << delta_w << endl;
-
-		 			cout << "\t" << W[i_w][1] << "-" << "0.5 * "<< delta_w << endl;
-
-		 			W[i_w][1] = W[i_w][1] - 0.5 * delta_w;
-
-	 				cout << "\t" << "upd " << W[i_w][1] << endl;
+		 			//cout << "\t" << delta_w << endl;
+		 			//cout << "\t" << W[i_w][1] << "-" << "0.5 * "<< delta_w << endl;
+		 			upd_W[i_w][1] = W[i_w][1] - 0.5 * delta_w;
+	 				//cout << "\t" << "upd " << W[i_w][1] << endl;
 
 	 				i_w++;
 		 		}
 	 		}
+
+	 		print("W\n",W);
+
+	 		cout << "Hidden Layer\n";
+	 		i_w = 0;
+
+	 		int i_p = 0;
+
+	 		for( int i_x = 0 ; i_x < D ; i_x++ ){
+	 			//cout << "o neuron " << i_x+1 << endl;
+
+		 		double delta_w = 1.0;
+				for( int i_z = 0; i_z < z.size() ; i_z++ ){
+					//cout << i_z << endl;
+		 			cout << "w " << i_w+1 << endl;
+
+		 			double sig_y = f_y[i_z];
+					double tmp_y = f_z[i_z];
+		 			
+		 			cout << "p1 = " << sig_y << " - " << pattern[i][D+i_p] << "=" << sig_y - pattern[i][D+i_p] << endl;
+		 			cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
+		 			cout << "p3 " << W[i_w][1] << endl;
+		 			cout << "p13 = " << (sig_y - pattern[i][D+i_p] ) * sig_y *(1 - sig_y) * W[i_w][1] << endl;
+		 			i_z = i_z + 1;
+
+		 			cout << "p1' = " << f_y[i_z] << " - " << pattern[i][D+i_p+1] << "=" << f_y[i_z] - pattern[i][D+i_p+1] << endl;
+		 			cout << "p2' = " << f_z[i_z] << " * " << (1 - f_z[i_z]) << "=" << f_z[i_z] *(1 - f_z[i_z]) << endl;
+		 			cout << "p3' " << W[i_w+1][1] << endl;
+		 			cout << "1p3' = " << (f_y[i_z] - pattern[i][D+i_p+1]) * f_z[i_z] *(1 - f_z[i_z]) * W[i_w+1][1] << endl;
+
+		 			cout << "p4 = " << tmp_y << " * " << (1 - tmp_y) << "=" << tmp_y *(1 - tmp_y) << endl;
+		 			cout << "p5 " << pattern[i][i_p] << endl;
+
+		 			delta_w = ( (sig_y - pattern[i][D+i_p]) * sig_y *(1 - sig_y) * W[i_w][1] + (f_y[i_z] - pattern[i][D+i_p+1]) * (f_z[i_z] *(1 - f_z[i_z])) *  W[i_w+1][1] ) * tmp_y *(1 - tmp_y) * pattern[i][i_p] ;
+
+		 			cout << "\t" << delta_w << endl;
+		 			cout << "\t" << W[i_w][0] << "-" << "0.5 * "<< delta_w << endl;
+		 			W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
+	 				cout << "\t" << "upd " << W[i_w][0] << endl;
+
+	 				i_w++;
+		 		}
+		 		i_p++;
+	 		}
+
+	 		cout << "i_W " << i_w << endl;
+
+	 		for( int i_x = 0 ; i_x < D ; i_x++ ){
+	 			//cout << "o neuron " << i_x+1 << endl;
+
+		 		double delta_w = 1.0;
+				for( int i_z = 0; i_z < z.size() ; i_z++ ){
+					//cout << i_z << endl;
+		 			cout << "w " << i_w+1 << endl;
+
+		 			double sig_y = f_y[i_z];
+					double tmp_y = f_z[i_z];
+		 			
+		 			cout << "p1 = " << sig_y << " - " << pattern[i][D+i_p] << "=" << sig_y - pattern[i][D+i_p] << endl;
+		 			cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
+		 			cout << "p3 " << W[i_w][1] << endl;
+		 			cout << "p13 = " << (sig_y - pattern[i][D+i_p] ) * sig_y *(1 - sig_y) * W[i_w][1] << endl;
+		 			i_z = i_z + 1;
+
+		 			cout << "p1' = " << f_y[i_z] << " - " << pattern[i][D+i_p+1] << "=" << f_y[i_z] - pattern[i][D+i_p+1] << endl;
+		 			cout << "p2' = " << f_z[i_z] << " * " << (1 - f_z[i_z]) << "=" << f_z[i_z] *(1 - f_z[i_z]) << endl;
+		 			cout << "p3' " << W[i_w+1][1] << endl;
+		 			cout << "1p3' = " << (f_y[i_z] - pattern[i][D+i_p+1]) * f_z[i_z] *(1 - f_z[i_z]) * W[i_w+1][1] << endl;
+
+		 			cout << "p4 = " << tmp_y << " * " << (1 - tmp_y) << "=" << tmp_y *(1 - tmp_y) << endl;
+		 			cout << "p5 " << pattern[i][i_p] << endl;
+
+		 			delta_w = ( (sig_y - pattern[i][D+i_p]) * sig_y *(1 - sig_y) * W[i_w][1] + (f_y[i_z] - pattern[i][D+i_p+1]) * (f_z[i_z] *(1 - f_z[i_z])) *  W[i_w+1][1] ) * tmp_y *(1 - tmp_y) * pattern[i][i_p] ;
+
+		 			cout << "\t" << delta_w << endl;
+		 			cout << "\t" << W[i_w][0] << "-" << "0.5 * "<< delta_w << endl;
+		 			W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
+	 				cout << "\t" << "upd " << W[i_w][0] << endl;
+
+	 				i_w++;
+		 		}
+		 		i_p++;
+	 		}
+
+
 	 	}
 		iter++;
 	}
 
-	/* code */
 	return 0;
 }
