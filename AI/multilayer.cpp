@@ -163,13 +163,67 @@ int main(int argc, char const *argv[]){
 	 		cout << "Error\n";
 
 	 		double total_error = 0;
-
+	 		int k;
 	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
 	 			cout << pattern[i][k] << "*" << y[i_o] << "=";
 	 			total_error += error2(pattern[i][k],y[i_o]);
 	 			cout << error2(pattern[i][k],y[i_o]) << endl;
 	 		}
 	 		cout << total_error << endl;
+
+	 		//Updating W from Z--O
+	 		cout << "Updating\n";
+
+
+
+	 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
+	 			cout << "o neuron " << i_z << endl;
+	 			//z[i_z] = 0;
+
+		 		double delta_w = 1.0;
+				for( int i_o = 0; i_o < y.size() ; i_o++ ){
+		 			cout << "h neuron " << i_o << endl;
+
+		 			double sig_y = sigmoid(y[i_z]);
+		 			delta_w = sig_y - pattern[i][D+i_o];
+
+		 			cout << "p1 " << delta_w << endl;
+
+		 			double tmp_y = sigmoid(y[i_z]);
+
+		 			cout << "p2 " << tmp_y *(1 - tmp_y) << endl;
+
+		 			cout << "p3 " << sigmoid(z[i_z]) << endl;
+
+		 			delta_w = delta_w * tmp_y *(1 - tmp_y) * sigmoid(z[i_z]) ;
+
+		 			cout << delta_w << endl;
+
+		 			z[i_z] = W[i_z][1] - 0.5 * delta_w;
+		 			cout << W[i_z][1] << "-" << "0.5 * "<< delta_w << endl;
+
+	 				cout << "upd " << z[i_z] << endl;
+		 		}
+	 		}
+
+
+	 		/*
+	 		double delta_w = 1.0;
+			for( int i_o = 0, k = D ; i_o < y.size() ; i_o++, k++ ){
+	 			cout << "o neuron " << i_o << endl;
+
+	 			double sig_y = sigmoid(y[i_o]);
+	 			delta_w = sig_y - pattern[i][k];
+	 			//cout << sigmoid(y[i_o]) << "-" << pattern[i][k] << endl;
+	 			//cout << delta_w << endl;
+	 			//cout << sig_y*(1-sig_y) << endl;
+	 			//cout << sigmoid(z[i_o]) << endl;
+
+	 			delta_w = sig_y*(1-sig_y) * sigmoid(z[i_o]) * delta_w;
+
+	 			cout << delta_w << endl;
+
+	 		}*/
 
 
 	// 		//cout << "sum: " << sum << "vs" << pattern[i][2] << endl;
