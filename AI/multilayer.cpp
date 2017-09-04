@@ -38,7 +38,6 @@ double my_sum( double x_1, double x_2, double bias, double y, vector<vector<doub
 
 double error2(double x, double y){
 	return (x-y)*(x-y)*0.5;
-
 }
 
 
@@ -53,44 +52,21 @@ int main(int argc, char const *argv[]){
 	//reading_params(name,params,patterns);
 
 	//AND
-	/*double pattern [4][3] = { 0, 1, 0, 
-						   0, 0, 0, 
+/*	double pattern [4][3] = { 0, 0, 0, 
+						   0, 1, 0, 
 						   1, 0, 0, 
 						   1, 1, 1 };
-*/
+*/						   
+	double pattern [4][4] = { 0.0, 0.0, 0.0, 0.0,
+						      0.0, 1.0, 1.0, 0.0, 
+						      1.0, 0.0, 0.0, 1.0,
+						      1.0, 1.0, 0.0, 0.0};
 
-
+    int nro_pattern = 4;
 	int D = 2;
 	int O = 2;
 
-	//Artificial Pattern
-	double pattern [4][3] = { 1.5, 3, 0, 
-	 					   3.5, 4, 1, 
-						   1.0, 2, 0, 
-	 					   4.0, 2, 1 };
-
-
-	vector<vector<double>> W ( 5, vector<double>(2));
-	vector<vector<double>> bias (3, vector<double>(2));
-
-	//init
-	default_random_engine rng( random_device{}() ); 		
-	uniform_real_distribution<double> dist( 0, 1 ); 
-	cout << "initial weigths\n";
-
-	
-	for (int i = 0; i < 3; ++i){
-		for(int j = 0 ; j < W[0].size() ; j++){
-			W[i][j] = dist(rng);
-			//W[i][j] = 0.5;
-			bias[i][j] = 1.0;
-			cout << W[i][j] << "\t";
-		}
-		cout << endl;
-	}
-	
-
-	double n = 0.5;
+	double n = 0.75;
 
 	double sum = 0.0;
 
@@ -99,16 +75,32 @@ int main(int argc, char const *argv[]){
 
 	int n_hidden = D;
 
+	vector<vector<double>> W ( D*n_hidden + 1, vector<double>(2) );
+
+	default_random_engine rng( random_device{}() ); 		
+	uniform_real_distribution<double> dist( 0, 1 ); 
+
+	cout << "initial weigths\n";
+
+	
+	for (int i = 0; i < W.size() ; ++i){
+		for(int j = 0 ; j < W[0].size() ; j++){
+			W[i][j] = dist(rng);
+			//W[i][j] = 0.5;
+			cout << W[i][j] << "\t";
+		}
+		cout << endl;
+	}
+	
+
 	vector<double> z( n_hidden );
 	vector<double> f_z( n_hidden );
 
-
-	int n_out = O;
-	vector<double> y( n_out );
-	vector<double> f_y( n_out );
+	vector<double> y( O );
+	vector<double> f_y( O );
 
 
-	vector<vector<double>> upd_W ( 5, vector<double>(2));
+	vector<vector<double>> upd_W ( W.size(), vector<double>(2));
 
 	for (int i = 0; i < upd_W.size() ; ++i){
 		for (int j = 0; j < upd_W[0].size() ; ++j){
@@ -116,12 +108,14 @@ int main(int argc, char const *argv[]){
 		}
 	}
 
+	double max_error = 1e-3;
 
+	double total_error = 0;
 
-	while( iter < maxIter ){
-		cout << "Iteration " << iter << endl;
+	while( iter < maxIter || total_error > max_error ){
+		//cout << "Iteration " << iter << endl;
 
-	 	for (int i = 0; i < 1; ++i){
+	 	for (int i = 0; i < nro_pattern; ++i){
 	 		//cout << "pattern " << i << endl;
 
 	 		//to manage indexes properly
@@ -136,7 +130,7 @@ int main(int argc, char const *argv[]){
 	 				z[i_z] += pattern[i][i_p]*W[i_w][0];
 	 				i_w++;
 	 			}
-	 			z[i_z] += 1.0*W[4][0]; //Adding bias
+	 			z[i_z] += 1.0*W[W.size()-1][0]; //Adding bias
 
 	 			i_w = D;
 
@@ -153,21 +147,21 @@ int main(int argc, char const *argv[]){
 	 				y[i_o] += f_z[i_h]*W[i_w][1];
 	 				i_w++;
 	 			}
-	 			y[i_o] += 1.0*W[4][1]; //adding bias
+	 			y[i_o] += 1.0*W[W.size()-1][1]; //adding bias
 
 	 			i_w = D;
 
 	 			f_y[i_o] = sigmoid(y[i_o]);
 	 		}
 
-	 		cout << "Error\n";
+	 		//cout << "Error\n";
 
-	 		double total_error = 0;
+	 		
 	 		int k;
 	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
 	 			total_error += error2( pattern[i][k], f_y[i_o]);
 	 		}
-	 		cout << total_error << endl;
+	 		//cout << total_error << endl;
 
 	 		//Updating W from Z--O
 	 		/*cout << "Updating\n";
@@ -192,7 +186,7 @@ int main(int argc, char const *argv[]){
 
 		 			delta_w = (sig_y - pattern[i][D+i_o]) * sig_y *(1.0 - sig_y) * tmp_y ;
 
-		 			upd_W[i_w][1] = W[i_w][1] - 0.5 * delta_w;
+		 			upd_W[i_w][1] = W[i_w][1] - n * delta_w;
 
 	 				i_w++;
 		 		}
@@ -224,20 +218,28 @@ int main(int argc, char const *argv[]){
 
 	 				delta_w = factor * sig_z * (1.0-sig_z) * pattern[i][i_x];
 
-		 			upd_W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
+		 			upd_W[i_w][0] = W[i_w][0] - n * delta_w;
 
 		 			i_w++;
 
 	 			}
 	 		}
 
-	 		print("f_y",f_y);
+	 		//print("\nf_y",f_y);
 
 	 		W = upd_W;
 
 	 	}
 		iter++;
+
+		cout << total_error << " ";
+
+		total_error = 0;
 	}
+
+	cout << endl;
+
+	print("\nFinal weights\n", W);
 
 	return 0;
 }
