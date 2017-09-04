@@ -108,7 +108,7 @@ int main(int argc, char const *argv[]){
 
 	double sum = 0.0;
 
-	int maxIter = 1;
+	int maxIter = 10000;
 	int iter = 0;
 
 	int n_hidden = D;
@@ -146,7 +146,8 @@ int main(int argc, char const *argv[]){
 
 	 		//Sum for hidden neurons
 	 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
-	 			cout << "h neuron " << i_z << endl;
+	 			/*cout << "h neuron " << i_z << endl;
+	 			*/
 	 			z[i_z] = 0;
 
 	 			for( int i_p = 0 ; i_p < D ; i_p++  ){
@@ -161,7 +162,8 @@ int main(int argc, char const *argv[]){
 
 	 			f_z[i_z] = sigmoid(z[i_z]); //saving function of z
 
-	 			cout << "\tz " << z[i_z] << "\t sig " << f_z[i_z] << endl;
+	 			/*cout << "\tz " << z[i_z] << "\t sig " << f_z[i_z] << endl;
+	 			*/
 	 		}
 
 	 		i_w = 0;
@@ -169,7 +171,8 @@ int main(int argc, char const *argv[]){
 
 	 		//Sum for outputs neurons
 	 		for( int i_o = 0 ; i_o < y.size() ; i_o++ ){
-	 			cout << "o neuron " << i_o << endl;
+	 			/*cout << "o neuron " << i_o << endl;
+	 			*/
 	 			y[i_o] = 0;
 	 			for( int i_h = 0 ; i_h < z.size() ; i_h++ ){
 	 				y[i_o] += f_z[i_h]*W[i_w][1];
@@ -184,7 +187,8 @@ int main(int argc, char const *argv[]){
 
 	 			f_y[i_o] = sigmoid(y[i_o]);
 
-	 			cout << "\tz " << y[i_o] << "\t sig " << f_y[i_o] << endl;
+	 			/*cout << "\tz " << y[i_o] << "\t sig " << f_y[i_o] << endl;
+	 			*/
 	 		}
 
 	 		cout << "Error\n";
@@ -196,17 +200,18 @@ int main(int argc, char const *argv[]){
 	 			total_error += error2( pattern[i][k], f_y[i_o]);
 	 			//cout << error2(pattern[i][k],sigmoid(y[i_o])) << endl;
 	 		}
-	 		//cout << total_error << endl;
-
+	 		cout << total_error << endl;
+/*
 	 		print("W\n",W);
 	 		print("Z:\t", z);
 	 		print("f(z):\t", f_z);
 	 		print("Y:\t", y);
 	 		print("f(y):\t", f_y);
-
+*/
 	 		//Updating W from Z--O
-	 		cout << "Updating\n";
+	 		/*cout << "Updating\n";
 	 		cout << "Output Layer\n";
+	 		*/
 	 		i_w = 0;
 
 
@@ -244,7 +249,7 @@ int main(int argc, char const *argv[]){
 		 		}
 	 		}
 
-	 		print("W\n",W);
+	 		//print("W\n",W);
 
 	 		cout << "Hidden Layer\n";
 	 		i_w = 0;
@@ -257,38 +262,41 @@ int main(int argc, char const *argv[]){
 		 		double delta_w = 1.0;
 				for( int i_z = 0; i_z < z.size() ; i_z++ ){
 					//cout << i_z << endl;
-		 			cout << "w " << i_w+1 << endl;
+		 			//cout << "w " << i_w+1 << endl;
 
 		 			double sig_y = f_y[i_z];
 					double tmp_y = f_z[i_z];
-		 			
+		 			/*
 		 			cout << "p1 = " << sig_y << " - " << pattern[i][D+i_p] << "=" << sig_y - pattern[i][D+i_p] << endl;
 		 			cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
 		 			cout << "p3 " << W[i_w][1] << endl;
 		 			cout << "p13 = " << (sig_y - pattern[i][D+i_p] ) * sig_y *(1 - sig_y) * W[i_w][1] << endl;
+		 			*/
 		 			i_z = i_z + 1;
 
-		 			cout << "p1' = " << f_y[i_z] << " - " << pattern[i][D+i_p+1] << "=" << f_y[i_z] - pattern[i][D+i_p+1] << endl;
+		 			/*cout << "p1' = " << f_y[i_z] << " - " << pattern[i][D+i_p+1] << "=" << f_y[i_z] - pattern[i][D+i_p+1] << endl;
 		 			cout << "p2' = " << f_z[i_z] << " * " << (1 - f_z[i_z]) << "=" << f_z[i_z] *(1 - f_z[i_z]) << endl;
 		 			cout << "p3' " << W[i_w+1][1] << endl;
 		 			cout << "1p3' = " << (f_y[i_z] - pattern[i][D+i_p+1]) * f_z[i_z] *(1 - f_z[i_z]) * W[i_w+1][1] << endl;
 
 		 			cout << "p4 = " << tmp_y << " * " << (1 - tmp_y) << "=" << tmp_y *(1 - tmp_y) << endl;
 		 			cout << "p5 " << pattern[i][i_p] << endl;
-
+					*/
 		 			delta_w = ( (sig_y - pattern[i][D+i_p]) * sig_y *(1 - sig_y) * W[i_w][1] + (f_y[i_z] - pattern[i][D+i_p+1]) * (f_z[i_z] *(1 - f_z[i_z])) *  W[i_w+1][1] ) * tmp_y *(1 - tmp_y) * pattern[i][i_p] ;
 
-		 			cout << "\t" << delta_w << endl;
+		 			/*cout << "\t" << delta_w << endl;
 		 			cout << "\t" << W[i_w][0] << "-" << "0.5 * "<< delta_w << endl;
+		 			*/
 		 			W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
-	 				cout << "\t" << "upd " << W[i_w][0] << endl;
+	 				/*cout << "\t" << "upd " << W[i_w][0] << endl;
+	 				*/
 
 	 				i_w++;
 		 		}
 		 		i_p++;
 	 		}
 
-	 		cout << "i_W " << i_w << endl;
+	 		//cout << "i_W " << i_w << endl;
 
 	 		for( int i_x = 0 ; i_x < D ; i_x++ ){
 	 			//cout << "o neuron " << i_x+1 << endl;
@@ -296,37 +304,42 @@ int main(int argc, char const *argv[]){
 		 		double delta_w = 1.0;
 				for( int i_z = 0; i_z < z.size() ; i_z++ ){
 					//cout << i_z << endl;
-		 			cout << "w " << i_w+1 << endl;
+		 			/*cout << "w " << i_w+1 << endl;
+		 			*/
 
 		 			double sig_y = f_y[i_z];
 					double tmp_y = f_z[i_z];
 		 			
-		 			cout << "p1 = " << sig_y << " - " << pattern[i][D+i_p] << "=" << sig_y - pattern[i][D+i_p] << endl;
+		 			/*cout << "p1 = " << sig_y << " - " << pattern[i][D+i_p] << "=" << sig_y - pattern[i][D+i_p] << endl;
 		 			cout << "p2 = " << sig_y << " * " << (1 - sig_y) << "=" << sig_y *(1 - sig_y) << endl;
 		 			cout << "p3 " << W[i_w][1] << endl;
 		 			cout << "p13 = " << (sig_y - pattern[i][D+i_p] ) * sig_y *(1 - sig_y) * W[i_w][1] << endl;
-		 			i_z = i_z + 1;
+		 			*/i_z = i_z + 1;
 
-		 			cout << "p1' = " << f_y[i_z] << " - " << pattern[i][D+i_p+1] << "=" << f_y[i_z] - pattern[i][D+i_p+1] << endl;
+		 			/*cout << "p1' = " << f_y[i_z] << " - " << pattern[i][D+i_p+1] << "=" << f_y[i_z] - pattern[i][D+i_p+1] << endl;
 		 			cout << "p2' = " << f_z[i_z] << " * " << (1 - f_z[i_z]) << "=" << f_z[i_z] *(1 - f_z[i_z]) << endl;
 		 			cout << "p3' " << W[i_w+1][1] << endl;
 		 			cout << "1p3' = " << (f_y[i_z] - pattern[i][D+i_p+1]) * f_z[i_z] *(1 - f_z[i_z]) * W[i_w+1][1] << endl;
 
 		 			cout << "p4 = " << tmp_y << " * " << (1 - tmp_y) << "=" << tmp_y *(1 - tmp_y) << endl;
 		 			cout << "p5 " << pattern[i][i_p] << endl;
-
+		 			*/
 		 			delta_w = ( (sig_y - pattern[i][D+i_p]) * sig_y *(1 - sig_y) * W[i_w][1] + (f_y[i_z] - pattern[i][D+i_p+1]) * (f_z[i_z] *(1 - f_z[i_z])) *  W[i_w+1][1] ) * tmp_y *(1 - tmp_y) * pattern[i][i_p] ;
 
-		 			cout << "\t" << delta_w << endl;
+		 			/*cout << "\t" << delta_w << endl;
 		 			cout << "\t" << W[i_w][0] << "-" << "0.5 * "<< delta_w << endl;
+		 			*/
 		 			W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
-	 				cout << "\t" << "upd " << W[i_w][0] << endl;
-
+	 				/*cout << "\t" << "upd " << W[i_w][0] << endl;
+	 				*/
 	 				i_w++;
 		 		}
 		 		i_p++;
 	 		}
 
+	 		print("f_y",f_y);
+
+	 		W = upd_W;
 
 	 	}
 		iter++;
