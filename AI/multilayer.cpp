@@ -53,23 +53,21 @@ int main(int argc, char const *argv[]){
 	//reading_params(name,params,patterns);
 
 	//AND
-	double pattern [4][3] = { 0, 1, 0, 
+	/*double pattern [4][3] = { 0, 1, 0, 
 						   0, 0, 0, 
 						   1, 0, 0, 
 						   1, 1, 1 };
-
+*/
 
 
 	int D = 2;
-	int O = 1;
-
-	//double pattern [1][4] = { 0.05, 0.1, 0.01, 0.99};
+	int O = 2;
 
 	//Artificial Pattern
-	// double pattern [4][3] = { 1.5, 3, 0, 
-	// 					   3.5, 4, 1, 
-	// 					   1.0, 2, 0, 
-	// 					   4.0, 2, 1 };
+	double pattern [4][3] = { 1.5, 3, 0, 
+	 					   3.5, 4, 1, 
+						   1.0, 2, 0, 
+	 					   4.0, 2, 1 };
 
 
 	vector<vector<double>> W ( 5, vector<double>(2));
@@ -79,19 +77,6 @@ int main(int argc, char const *argv[]){
 	default_random_engine rng( random_device{}() ); 		
 	uniform_real_distribution<double> dist( 0, 1 ); 
 	cout << "initial weigths\n";
-/*
-	W[0][0] = .15;
-	W[1][0] = .20;
-	W[2][0] = .25;
-	W[3][0] = .30;
-	W[4][0] = .35;
-	 
-	W[0][1] = .40;
-	W[1][1] = .45;
-	W[2][1] = .50;
-	W[3][1] = .55;
-	W[4][1] = .60;
-*/
 
 	
 	for (int i = 0; i < 3; ++i){
@@ -136,7 +121,204 @@ int main(int argc, char const *argv[]){
 	while( iter < maxIter ){
 		cout << "Iteration " << iter << endl;
 
-	 	for (int i = 0; i < 4; ++i){
+	 	for (int i = 0; i < 1; ++i){
+	 		//cout << "pattern " << i << endl;
+
+	 		//to manage indexes properly
+	 		int i_w = 0;
+	 		int i_w_lim = D;
+
+	 		//Sum for hidden neurons
+	 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
+	 			z[i_z] = 0;
+
+	 			for( int i_p = 0 ; i_p < D ; i_p++  ){
+	 				z[i_z] += pattern[i][i_p]*W[i_w][0];
+	 				i_w++;
+	 			}
+	 			z[i_z] += 1.0*W[4][0]; //Adding bias
+
+	 			i_w = D;
+
+	 			f_z[i_z] = sigmoid(z[i_z]); //saving function of z
+	 		}
+
+	 		i_w = 0;
+	 		i_w_lim = n_hidden;
+
+	 		//Sum for outputs neurons
+	 		for( int i_o = 0 ; i_o < y.size() ; i_o++ ){
+	 			y[i_o] = 0;
+	 			for( int i_h = 0 ; i_h < z.size() ; i_h++ ){
+	 				y[i_o] += f_z[i_h]*W[i_w][1];
+	 				i_w++;
+	 			}
+	 			y[i_o] += 1.0*W[4][1]; //adding bias
+
+	 			i_w = D;
+
+	 			f_y[i_o] = sigmoid(y[i_o]);
+	 		}
+
+	 		cout << "Error\n";
+
+	 		double total_error = 0;
+	 		int k;
+	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
+	 			total_error += error2( pattern[i][k], f_y[i_o]);
+	 		}
+	 		cout << total_error << endl;
+
+	 		//Updating W from Z--O
+	 		/*cout << "Updating\n";
+	 		cout << "Output Layer\n";
+	 		*/
+	 		i_w = 0;
+
+
+	 		//why the second index of pattern is [D+i_z]????
+	 		//is it limited for hidden neurons????
+	 		// the number of weights is H*O
+			for( int i_o = 0; i_o < y.size() ; i_o++ ){
+
+	 			//cout << "o neuron " << i_o+1 << endl;
+
+		 		double delta_w = 1.0;
+		 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
+
+		 			double sig_y = f_y[i_o];
+
+		 			double tmp_y = f_z[i_z];
+
+		 			delta_w = (sig_y - pattern[i][D+i_o]) * sig_y *(1.0 - sig_y) * tmp_y ;
+
+		 			upd_W[i_w][1] = W[i_w][1] - 0.5 * delta_w;
+
+	 				i_w++;
+		 		}
+	 		}
+
+	 		//cout << "Hidden Layer\n";
+	 		i_w = 0;
+
+		 	int idx_w = 0;
+
+			for( int i_z = 0; i_z < z.size() ; i_z++ ){
+
+		 		double delta_w = 1.0;
+
+		 		double factor = 0;
+
+
+	 			for( int idx_o = 0 ; idx_o < O ; idx_o++ ){
+	 				double sig_y = sigmoid(y[idx_o]);
+	 				factor += (sig_y - pattern[i][D+idx_o]) * sig_y * (1.0-sig_y) * W[idx_w][1];
+	 				idx_w+=2;
+	 			}
+
+	 			idx_w = 1;
+
+	 			for( int i_x = 0 ; i_x < D ; i_x++ ){
+
+	 				double sig_z = sigmoid(z[i_z]);
+
+	 				delta_w = factor * sig_z * (1.0-sig_z) * pattern[i][i_x];
+
+		 			upd_W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
+
+		 			i_w++;
+
+	 			}
+	 		}
+
+	 		print("f_y",f_y);
+
+	 		W = upd_W;
+
+	 	}
+		iter++;
+	}
+
+	return 0;
+}
+
+void test_1(int maxIter){
+
+	int D = 2;
+	int O = 2;
+
+	double pattern [1][4] = { 0.05, 0.1, 0.01, 0.99};
+
+	//Artificial Pattern
+	// double pattern [4][3] = { 1.5, 3, 0, 
+	// 					   3.5, 4, 1, 
+	// 					   1.0, 2, 0, 
+	// 					   4.0, 2, 1 };
+
+
+	vector<vector<double>> W ( 5, vector<double>(2));
+	vector<vector<double>> bias (3, vector<double>(2));
+
+	//init
+	default_random_engine rng( random_device{}() ); 		
+	uniform_real_distribution<double> dist( 0, 1 ); 
+	cout << "initial weigths\n";
+
+	W[0][0] = .15;
+	W[1][0] = .20;
+	W[2][0] = .25;
+	W[3][0] = .30;
+	W[4][0] = .35;
+	 
+	W[0][1] = .40;
+	W[1][1] = .45;
+	W[2][1] = .50;
+	W[3][1] = .55;
+	W[4][1] = .60;
+
+	/*
+	for (int i = 0; i < 3; ++i){
+		for(int j = 0 ; j < W[0].size() ; j++){
+			//W[i][j] = dist(rng);
+			//W[i][j] = 0.5;
+			bias[i][j] = 1.0;
+			cout << W[i][j] << "\t";
+		}
+		cout << endl;
+	}
+	*/
+
+	double n = 0.5;
+
+	double sum = 0.0;
+
+	int iter = 0;
+
+	int n_hidden = D;
+
+	vector<double> z( n_hidden );
+	vector<double> f_z( n_hidden );
+
+
+	int n_out = O;
+	vector<double> y( n_out );
+	vector<double> f_y( n_out );
+
+
+	vector<vector<double>> upd_W ( 5, vector<double>(2));
+
+	for (int i = 0; i < upd_W.size() ; ++i){
+		for (int j = 0; j < upd_W[0].size() ; ++j){
+			upd_W[i][j] = W[i][j];
+		}
+	}
+
+
+
+	while( iter < maxIter ){
+		cout << "Iteration " << iter << endl;
+
+	 	for (int i = 0; i < 1; ++i){
 	 		//cout << "pattern " << i << endl;
 
 	 		//sum = my_sum( pattern[i][0], pattern[i][1], bias, pattern[i][2], W_1 );
@@ -362,5 +544,4 @@ int main(int argc, char const *argv[]){
 		iter++;
 	}
 
-	return 0;
 }
