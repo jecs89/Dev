@@ -53,17 +53,17 @@ int main(int argc, char const *argv[]){
 	//reading_params(name,params,patterns);
 
 	//AND
-	/*double pattern [4][3] = { 0, 1, 0, 
+	double pattern [4][3] = { 0, 1, 0, 
 						   0, 0, 0, 
 						   1, 0, 0, 
 						   1, 1, 1 };
-*/
+
 
 
 	int D = 2;
-	int O = 2;
+	int O = 1;
 
-	double pattern [1][4] = { 0.05, 0.1, 0.01, 0.99};
+	//double pattern [1][4] = { 0.05, 0.1, 0.01, 0.99};
 
 	//Artificial Pattern
 	// double pattern [4][3] = { 1.5, 3, 0, 
@@ -78,8 +78,8 @@ int main(int argc, char const *argv[]){
 	//init
 	default_random_engine rng( random_device{}() ); 		
 	uniform_real_distribution<double> dist( 0, 1 ); 
-	//cout << "initial weigths\n";
-
+	cout << "initial weigths\n";
+/*
 	W[0][0] = .15;
 	W[1][0] = .20;
 	W[2][0] = .25;
@@ -91,18 +91,19 @@ int main(int argc, char const *argv[]){
 	W[2][1] = .50;
 	W[3][1] = .55;
 	W[4][1] = .60;
+*/
 
-	/*
+	
 	for (int i = 0; i < 3; ++i){
 		for(int j = 0 ; j < W[0].size() ; j++){
-			//W[i][j] = dist(rng);
+			W[i][j] = dist(rng);
 			//W[i][j] = 0.5;
 			bias[i][j] = 1.0;
 			cout << W[i][j] << "\t";
 		}
 		cout << endl;
 	}
-	*/
+	
 
 	double n = 0.5;
 
@@ -133,9 +134,9 @@ int main(int argc, char const *argv[]){
 
 
 	while( iter < maxIter ){
-		//cout << "Iteration " << iter << endl;
+		cout << "Iteration " << iter << endl;
 
-	 	for (int i = 0; i < 1; ++i){
+	 	for (int i = 0; i < 4; ++i){
 	 		//cout << "pattern " << i << endl;
 
 	 		//sum = my_sum( pattern[i][0], pattern[i][1], bias, pattern[i][2], W_1 );
@@ -191,7 +192,7 @@ int main(int argc, char const *argv[]){
 	 			*/
 	 		}
 
-	 		//cout << "Error\n";
+	 		cout << "Error\n";
 
 	 		double total_error = 0;
 	 		int k;
@@ -200,7 +201,7 @@ int main(int argc, char const *argv[]){
 	 			total_error += error2( pattern[i][k], f_y[i_o]);
 	 			//cout << error2(pattern[i][k],sigmoid(y[i_o])) << endl;
 	 		}
-	 		cout << total_error << " ";
+	 		cout << total_error << endl;
 /*
 	 		print("W\n",W);
 	 		print("Z:\t", z);
@@ -259,9 +260,11 @@ int main(int argc, char const *argv[]){
 	 		i_w = 0;
 
 	 		//int i_p = 0;
+		 		int idx_w = 0;
 
 			for( int i_z = 0; i_z < z.size() ; i_z++ ){
 
+				//cout << "i_z" << i_z << endl;
 	 		//for( int i_x = 0 ; i_x < D ; i_x++ ){
 	 			//cout << "o neuron " << i_x+1 << endl;
 
@@ -271,12 +274,20 @@ int main(int argc, char const *argv[]){
 		 		double factor = 0;
 
 		 		//int idx_o = 0;
-		 		int idx_w = 0;
 
 	 			for( int idx_o = 0 ; idx_o < O ; idx_o++ ){
 	 				double sig_y = sigmoid(y[idx_o]);
-	 				factor += (y[idx_o] - pattern[i][D+idx_o]) * sig_y * (1.0-sig_y) * W[idx_w][1];
+	 				factor += (sig_y - pattern[i][D+idx_o]) * sig_y * (1.0-sig_y) * W[idx_w][1];
+	 				//cout << "i_o " << idx_o << " W " << idx_w << endl;
+
+	 				//cout <<  sig_y << "-" << pattern[i][D+idx_o] << endl;
+	 				//cout << (sig_y - pattern[i][D+idx_o]) << " * " << sig_y * (1.0-sig_y) <<  "*" << W[idx_w][1] << endl;
+
+
+
 	 				idx_w+=2;
+
+
 	 				//idx_o++;
 	 			}
 
@@ -284,9 +295,13 @@ int main(int argc, char const *argv[]){
 
 	 			for( int i_x = 0 ; i_x < D ; i_x++ ){
 
+	 				//cout << "i_x" << i_x << endl;
+
 	 				double sig_z = sigmoid(z[i_z]);
 
 	 				delta_w = factor * sig_z * (1.0-sig_z) * pattern[i][i_x];
+
+	 				//cout << delta_w << endl;
 
 		 			upd_W[i_w][0] = W[i_w][0] - 0.5 * delta_w;
 
@@ -339,16 +354,9 @@ int main(int argc, char const *argv[]){
 
 
 
-	 		//print("f_y",f_y);
+	 		print("f_y",f_y);
 
-	 		//W = upd_W;
-
-	 		for (int i = 0; i < upd_W.size() ; ++i){
-				for (int j = 0; j < upd_W[0].size() ; ++j){
-					W[i][j] = upd_W[i][j];
-				}
-			}
-
+	 		W = upd_W;
 
 	 	}
 		iter++;
