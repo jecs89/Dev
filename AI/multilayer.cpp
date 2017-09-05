@@ -40,6 +40,16 @@ double error2(double x, double y){
 	return (x-y)*(x-y)*0.5;
 }
 
+pair<double,double> get_limits(vector<vector<double>>& data, int col){
+	double max = -10e-10;
+	double min = 10e+10;
+	for (int i = 0; i < data.size(); ++i){
+		min = (data[i][col] < min) ? data[i][col] : min;
+		max = (data[i][col] > max) ? data[i][col] : max;
+	}
+	return pair<double,double>(min,max);
+}
+
 
 int main(int argc, char const *argv[]){
 	
@@ -105,7 +115,25 @@ int main(int argc, char const *argv[]){
 		}
 	}
 
-	//print("p\n", pattern_aug);
+	//Getting limits
+
+	vector<pair<double,double>> v_limits;
+
+	for( int j = 0 ; j < (pattern_aug[0].size()-3) ; j++ ){
+		pair<double,double> limits = get_limits(pattern_aug,j);
+		cout << limits.first << "\t" << limits.second << endl;
+		v_limits.push_back(limits);
+	}
+
+	//Normalizing data
+
+	for( int i = 0 ; i < pattern_aug.size() ; i++ ){
+		for( int j = 0 ; j < (pattern_aug[0].size()-3) ; j++ ){
+			pattern_aug[i][j] = (pattern_aug[i][j] - v_limits[j].first) / ( v_limits[j].second - v_limits[j].first );
+		}
+	}
+
+	print("p\n", pattern_aug);
 
 	pattern = pattern_aug;
 
