@@ -69,6 +69,46 @@ int main(int argc, char const *argv[]){
 						      1.0, 1.0, 0.0, 0.0};
 						      */
 
+	//Ordering pattern, the 1th col -> last col
+	for( int i = 0 ; i < pattern.size() ; i++ ){
+		double tmp = pattern[i][0];
+		for( int j = 1 ; j < pattern[0].size() ; j++ ){
+			pattern[i][j-1] = pattern[i][j];
+		}
+		pattern[i][pattern[0].size()-1] = tmp;
+	}
+
+	int nro_class = 3;
+
+	//Adding columns to have a out neuron specialized
+	vector<vector<double>> pattern_aug( pattern.size(), vector<double>( pattern[0].size() + nro_class - 1 ) );
+
+	for( int i = 0 ; i < pattern_aug.size() ; i++ ){
+
+		for( int j = 0 ; j < pattern[0].size() ; j++ ){
+			pattern_aug[i][j] = pattern[i][j];
+		}
+
+		if( pattern_aug[i][pattern[0].size()-1] == 1 ){
+			pattern_aug[i][pattern[0].size()] = 0;
+			pattern_aug[i][pattern[0].size()+1] = 0;
+		}
+		else if( pattern_aug[i][pattern[0].size()-1] == 2 ){
+			pattern_aug[i][pattern[0].size()-1] = 0;
+			pattern_aug[i][pattern[0].size()]   = 1;
+			pattern_aug[i][pattern[0].size()+1] = 0;
+		}
+		else if( pattern_aug[i][pattern[0].size()-1] == 3 ){
+			pattern_aug[i][pattern[0].size()-1] = 0;
+			pattern_aug[i][pattern[0].size()]   = 0;
+			pattern_aug[i][pattern[0].size()+1] = 1;
+		}
+	}
+
+	//print("p\n", pattern_aug);
+
+	pattern = pattern_aug;
+
     int nro_pattern = params[0];
 	int D = params[1] - params[2];
 	int O = params[2];
