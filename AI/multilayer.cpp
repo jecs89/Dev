@@ -43,30 +43,37 @@ double error2(double x, double y){
 
 int main(int argc, char const *argv[]){
 	
-	/*string name;
+	string name;
 	cin >> name;
-*/
-	vector<double> params(2);
-	vector<vector<double>> patterns;
 
-	//reading_params(name,params,patterns);
+	vector<double> params(3);
+	vector<vector<double>> pattern(params[0],vector<double>(params[1]));
+
+	reading_params(name,params,pattern);
+
+	print("p\n", params);
+	print("p\n", pattern);
 
 	//AND
 /*	double pattern [4][3] = { 0, 0, 0, 
 						   0, 1, 0, 
 						   1, 0, 0, 
 						   1, 1, 1 };
-*/						   
-	double pattern [4][4] = { 0.0, 0.0, 0.0, 0.0,
+*/					
+
+	   
+	//XOR
+	/*double pattern [4][4] = { 0.0, 0.0, 0.0, 0.0,
 						      0.0, 1.0, 1.0, 0.0, 
 						      1.0, 0.0, 0.0, 1.0,
 						      1.0, 1.0, 0.0, 0.0};
+						      */
 
-    int nro_pattern = 4;
-	int D = 2;
-	int O = 2;
+    int nro_pattern = params[0];
+	int D = params[1] - params[2];
+	int O = params[2];
 
-	double n = 0.75;
+	double n = 0.5;
 
 	double sum = 0.0;
 
@@ -78,7 +85,7 @@ int main(int argc, char const *argv[]){
 	vector<vector<double>> W ( D*n_hidden + 1, vector<double>(2) );
 
 	default_random_engine rng( random_device{}() ); 		
-	uniform_real_distribution<double> dist( 0, 1 ); 
+	uniform_real_distribution<double> dist( -1, 1 ); 
 
 	cout << "initial weigths\n";
 
@@ -164,9 +171,9 @@ int main(int argc, char const *argv[]){
 	 		//cout << total_error << endl;
 
 	 		//Updating W from Z--O
-	 		/*cout << "Updating\n";
-	 		cout << "Output Layer\n";
-	 		*/
+	 		//cout << "Updating\n";
+	 		//cout << "Output Layer\n";
+	 		
 	 		i_w = 0;
 
 
