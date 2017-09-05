@@ -46,13 +46,13 @@ int main(int argc, char const *argv[]){
 	string name;
 	cin >> name;
 
-	vector<double> params(3);
-	vector<vector<double>> pattern(params[0],vector<double>(params[1]));
+	vector<double> params;
+	vector<vector<double>> pattern;
 
 	reading_params(name,params,pattern);
 
 	print("p\n", params);
-	print("p\n", pattern);
+	//print("p\n", pattern);
 
 	//AND
 /*	double pattern [4][3] = { 0, 0, 0, 
@@ -87,16 +87,16 @@ int main(int argc, char const *argv[]){
 	default_random_engine rng( random_device{}() ); 		
 	uniform_real_distribution<double> dist( -1, 1 ); 
 
-	cout << "initial weigths\n";
+	//cout << "initial weigths\n";
 
 	
 	for (int i = 0; i < W.size() ; ++i){
 		for(int j = 0 ; j < W[0].size() ; j++){
 			W[i][j] = dist(rng);
 			//W[i][j] = 0.5;
-			cout << W[i][j] << "\t";
+			//cout << W[i][j] << "\t";
 		}
-		cout << endl;
+		//cout << endl;
 	}
 	
 
@@ -115,7 +115,7 @@ int main(int argc, char const *argv[]){
 		}
 	}
 
-	double max_error = 1e-3;
+	double max_error = 1e-6;
 
 	double total_error = 0;
 
@@ -246,7 +246,7 @@ int main(int argc, char const *argv[]){
 
 	cout << endl;
 
-	print("\nFinal weights\n", W);
+	//print("\nFinal weights\n", W);
 
 	return 0;
 }

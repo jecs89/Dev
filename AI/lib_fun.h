@@ -22,7 +22,7 @@ template<typename T> void print( string title, vector<T> & Q_t);
 void assign_values(string line1, vector<double>& values){
 	//cout << line1.substr(0,line1.find(" ")) << endl;
 
-	int val = -1;
+	double val = -1;
 
 	if ( ! (istringstream(line1.substr(0,line1.find(" "))) >> val) ) val = -1;
 	values.push_back(val);
@@ -35,17 +35,19 @@ void assign_values(string line1, vector<double>& values){
 	//cout << line1 << endl;
 
 	//cout << "///\n";
-	while( line1.length() > 0 ){
+	while( line1.length() > 0 && line1.find(" ") < 10e+7){
 
 		//cout << "L1 "<<line1 << endl;
 
 	    string tmp = line1.substr(0,line1.find(" "));
 	    //cout << "tmp " <<  tmp << endl;
 
+	    //cout << "POS " << line1.find(" ") << endl;
+
 	    if ( ! (istringstream(tmp) >> val) ) {val = -1;}
 	    values.push_back(val);
 
-	    //cout << "v " << values[i] << endl;
+	    //cout << "v " << val << endl;
 
 	    line1 = line1.substr(line1.find(" ")+1,line1.length()-1) ;
 
@@ -57,6 +59,11 @@ void assign_values(string line1, vector<double>& values){
 
 
 	}
+
+	string tmp = line1;
+	if ( ! (istringstream(tmp) >> val) ) {val = -1;}
+	values.push_back(val);
+
 }
 
 void reading_params( string name, vector<double>& params, vector<vector<double>>& patterns ){
@@ -75,7 +82,7 @@ void reading_params( string name, vector<double>& params, vector<vector<double>>
   	cout << "pat\n";
 
   	int i = 0;
-    while( !file.eof() ){
+    while( !file.eof() || i != params[0] ){
     	vector<double> vector_values;
 
         getline( file, line1 );
@@ -88,6 +95,7 @@ void reading_params( string name, vector<double>& params, vector<vector<double>>
         //print("v\n",vector_values);
         
         patterns.push_back(vector_values);
+        //cout << i << endl;
         i++;
     }
 
