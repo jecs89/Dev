@@ -27,7 +27,7 @@ double sigmoid(double a){
 }
 
 double activator(double val){
-	return ( val > 0.5 ) ? 1.0:0.0;
+	return ( val > 0 ) ? 1.0:-1.0;
 }
 
 vector<double> vsigmoid(vector<double> a){
@@ -267,10 +267,10 @@ int main(int argc, char const *argv[]){
 
 	 		//cout << total_error << endl;
 	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
-	 			//total_error += error2( pattern[i][k], activator(f_y[i_o]));
-	 			total_error += error2( pattern[i][k], f_y[i_o]);
+	 			total_error += error2( pattern[i][k], activator(f_y[i_o]));
+	 			//total_error += error2( pattern[i][k], f_y[i_o]);
 
-	 			//cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << endl;
+	 			//cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << " " << activator(f_y[i_o]) << endl;
 
 	 			//cout << total_error << " ";
 	 		}
@@ -340,14 +340,15 @@ int main(int argc, char const *argv[]){
 
 	 		//cout << pattern[i][D] << " " << pattern[i][D+1] << " " << pattern[i][D+2] << endl;
 
-	 		print("\nf_y",f_y);
+	 		//if( iter % 1000 == 0 ) 
+	 			//print("\nf_y",f_y);
 
 	 		W = upd_W;
 
 	 	}
 		iter++;
 
-		cout << total_error/pattern_aug.size() << "\n";
+		cout << 100 - total_error/pattern_aug.size() << "\n";
 
 		total_error = 0;
 	}
