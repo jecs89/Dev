@@ -18,8 +18,16 @@ int sgn(double x){
 	return ( x > 0 ) ? 1 : 0;
 }
 
-double sigmoid(double a){
+/*double sigmoid(double a){
 	return 1.0/( 1.0 + exp(-a) );
+}*/
+
+double sigmoid(double a){
+	return 1.7159 * tanh(0.6666*a) ;
+}
+
+double activator(double val){
+	return ( val > 0.5 ) ? 1.0:0.0;
 }
 
 vector<double> vsigmoid(vector<double> a){
@@ -37,7 +45,7 @@ double my_sum( double x_1, double x_2, double bias, double y, vector<vector<doub
 }
 
 double error2(double x, double y){
-	return (x-y)*(x-y);
+	return (x-y)*(x-y)*0.5;
 }
 
 pair<double,double> get_limits(vector<vector<double>>& data, int col){
@@ -50,11 +58,23 @@ pair<double,double> get_limits(vector<vector<double>>& data, int col){
 	return pair<double,double>(min,max);
 }
 
+void shuffling_dataset(vector<vector<double>>& data){
+
+	default_random_engine rng( random_device{}() ); 		
+	uniform_real_distribution<double> dist( 0, 1 ); 
+
+	for (int i = 0; i < data.size()/2; ++i){
+		if( dist(rng) > 0.5 ){
+			data[i].swap(data[data.size()-1-i]);
+		}
+	}
+}
+
 
 int main(int argc, char const *argv[]){
 	
-	string name;
-	cin >> name;
+	string name = "wine.data";
+	//cin >> name;
 
 	vector<double> params;
 	vector<vector<double>> pattern;
@@ -80,13 +100,13 @@ int main(int argc, char const *argv[]){
 						      */
 
 	//Ordering pattern, the 1th col -> last col
-	/*for( int i = 0 ; i < pattern.size() ; i++ ){
+	for( int i = 0 ; i < pattern.size() ; i++ ){
 		double tmp = pattern[i][0];
 		for( int j = 1 ; j < pattern[0].size() ; j++ ){
 			pattern[i][j-1] = pattern[i][j];
 		}
 		pattern[i][pattern[0].size()-1] = tmp;
-	}*/
+	}
 
 	int nro_class = 3;
 
@@ -100,17 +120,17 @@ int main(int argc, char const *argv[]){
 		}
 
 		if( pattern_aug[i][pattern[0].size()-1] == 1 ){
-			pattern_aug[i][pattern[0].size()] = 0;
-			pattern_aug[i][pattern[0].size()+1] = 0;
+			pattern_aug[i][pattern[0].size()] = -1;
+			pattern_aug[i][pattern[0].size()+1] = -1;
 		}
 		else if( pattern_aug[i][pattern[0].size()-1] == 2 ){
-			pattern_aug[i][pattern[0].size()-1] = 0;
+			pattern_aug[i][pattern[0].size()-1] = -1;
 			pattern_aug[i][pattern[0].size()]   = 1;
-			pattern_aug[i][pattern[0].size()+1] = 0;
+			pattern_aug[i][pattern[0].size()+1] = -1;
 		}
 		else if( pattern_aug[i][pattern[0].size()-1] == 3 ){
-			pattern_aug[i][pattern[0].size()-1] = 0;
-			pattern_aug[i][pattern[0].size()]   = 0;
+			pattern_aug[i][pattern[0].size()-1] = -1;
+			pattern_aug[i][pattern[0].size()]   = -1;
 			pattern_aug[i][pattern[0].size()+1] = 1;
 		}
 	}
@@ -133,18 +153,22 @@ int main(int argc, char const *argv[]){
 		}
 	}
 
-	print("p\n", pattern_aug);
+	//print("p\n", pattern_aug);
 
-	params[1] = params[1] + 2;
-	params[2] = params[2] + 2;
+	params[1] = 13 + 3;
+	params[2] = 1 + 2;
 
 	pattern = pattern_aug;
+	shuffling_dataset(pattern);
+
+	//print("p\n", pattern);
+
 
     int nro_pattern = params[0];
 	int D = params[1] - params[2];
 	int O = params[2];
 
-	double n = 0.5;
+	double n = 0.25;
 
 	double sum = 0.0;
 
@@ -155,8 +179,9 @@ int main(int argc, char const *argv[]){
 
 	vector<vector<double>> W ( D*n_hidden + 1, vector<double>(2) );
 
-	default_random_engine rng( random_device{}() ); 		
-	uniform_real_distribution<double> dist( -0.5, 0.5 ); 
+	default_random_engine rng( random_device{}() ); 
+	double rnd_limit = 4.0 * (sqrt(6)/sqrt(13+3));
+	uniform_real_distribution<double> dist( -rnd_limit, rnd_limit ); 
 
 	//cout << "initial weigths\n";
 
@@ -191,10 +216,13 @@ int main(int argc, char const *argv[]){
 	double total_error = 0;
 
 	while( iter < maxIter || total_error > max_error ){
-		cout << "Iteration " << iter << endl;
+
+		//n = n / double(iter+1);
+
+		cout << "Iteration " << iter << "\t";
 
 	 	for (int i = 0; i < nro_pattern; ++i){
-	 		//cout << "pattern " << i << endl;
+	 		cout << "pattern " << i << endl;
 
 	 		//to manage indexes properly
 	 		int i_w = 0;
@@ -239,7 +267,11 @@ int main(int argc, char const *argv[]){
 
 	 		//cout << total_error << endl;
 	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
+	 			//total_error += error2( pattern[i][k], activator(f_y[i_o]));
 	 			total_error += error2( pattern[i][k], f_y[i_o]);
+
+	 			cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << endl;
+
 	 			//cout << total_error << " ";
 	 		}
 	 		//cout << total_error << endl;
@@ -265,7 +297,7 @@ int main(int argc, char const *argv[]){
 
 		 			double tmp_y = f_z[i_z];
 
-		 			delta_w = (sig_y - pattern[i][D+i_o]) * sig_y *(1.0 - sig_y) * tmp_y ;
+		 			delta_w = (sig_y - pattern[i][D+i_o]) * sig_y *(1-tanh(y[i_o])*tanh(y[i_o])) * tmp_y ;
 
 		 			upd_W[i_w][1] = W[i_w][1] - n * delta_w;
 
@@ -287,7 +319,7 @@ int main(int argc, char const *argv[]){
 
 	 			for( int idx_o = 0 ; idx_o < O ; idx_o++ ){
 	 				double sig_y = sigmoid(y[idx_o]);
-	 				factor += (sig_y - pattern[i][D+idx_o]) * sig_y * (1.0-sig_y) * W[idx_w][1];
+	 				factor += (sig_y - pattern[i][D+idx_o]) * sig_y * (1-tanh(y[idx_o])*tanh(y[idx_o])) * W[idx_w][1];
 	 				idx_w+=2;
 	 			}
 
@@ -297,7 +329,7 @@ int main(int argc, char const *argv[]){
 
 	 				double sig_z = sigmoid(z[i_z]);
 
-	 				delta_w = factor * sig_z * (1.0-sig_z) * pattern[i][i_x];
+	 				delta_w = factor * sig_z * (1-tanh(z[i_z])*tanh(z[i_z])) * pattern[i][i_x];
 
 		 			upd_W[i_w][0] = W[i_w][0] - n * delta_w;
 
@@ -306,14 +338,16 @@ int main(int argc, char const *argv[]){
 	 			}
 	 		}
 
-	 		//print("\nf_y",f_y);
+	 		cout << pattern[i][D] << " " << pattern[i][D+1] << " " << pattern[i][D+2] << endl;
+
+	 		print("\nf_y",f_y);
 
 	 		W = upd_W;
 
 	 	}
 		iter++;
 
-		cout << total_error/pattern_aug.size() << " ";
+		cout << total_error/pattern_aug.size() << "\n";
 
 		total_error = 0;
 	}
