@@ -70,36 +70,8 @@ void shuffling_dataset(vector<vector<double>>& data){
 	}
 }
 
-
-int main(int argc, char const *argv[]){
-	
-	string name = "wine.data";
-	//cin >> name;
-
-	vector<double> params;
-	vector<vector<double>> pattern;
-
-	reading_params(name,params,pattern);
-
-	print("p\n", params);
-	//print("p\n", pattern);
-
-	//AND
-/*	double pattern [4][3] = { 0, 0, 0, 
-						   0, 1, 0, 
-						   1, 0, 0, 
-						   1, 1, 1 };
-*/					
-
-	   
-	//XOR
-	/*double pattern [4][4] = { 0.0, 0.0, 0.0, 0.0,
-						      0.0, 1.0, 1.0, 0.0, 
-						      1.0, 0.0, 0.0, 1.0,
-						      1.0, 1.0, 0.0, 0.0};
-						      */
-
-	//Ordering pattern, the 1th col -> last col
+void prepare_dataset(vector<vector<double>>& pattern){
+		//Ordering pattern, the 1th col -> last col
 	for( int i = 0 ; i < pattern.size() ; i++ ){
 		double tmp = pattern[i][0];
 		for( int j = 1 ; j < pattern[0].size() ; j++ ){
@@ -153,16 +125,47 @@ int main(int argc, char const *argv[]){
 		}
 	}
 
+	pattern = pattern_aug;
+	shuffling_dataset(pattern);
 	//print("p\n", pattern_aug);
+}
+
+
+int main(int argc, char const *argv[]){
+	
+	string name = "wine.data";
+	//cin >> name;
+
+	vector<double> params;
+	vector<vector<double>> pattern;
+
+	reading_params(name,params,pattern);
+
+	print("p\n", params);
+	//print("p\n", pattern);
+
+	//AND
+/*	double pattern [4][3] = { 0, 0, 0, 
+						   0, 1, 0, 
+						   1, 0, 0, 
+						   1, 1, 1 };
+*/					
+
+	   
+	//XOR
+	/*double pattern [4][4] = { 0.0, 0.0, 0.0, 0.0,
+						      0.0, 1.0, 1.0, 0.0, 
+						      1.0, 0.0, 0.0, 1.0,
+						      1.0, 1.0, 0.0, 0.0};
+						      */
+
+	prepare_dataset(pattern);
+	
 
 	params[1] = 13 + 3;
 	params[2] = 1 + 2;
 
-	pattern = pattern_aug;
-	shuffling_dataset(pattern);
-
 	//print("p\n", pattern);
-
 
     int nro_pattern = params[0];
 	int D = params[1] - params[2];
@@ -184,7 +187,6 @@ int main(int argc, char const *argv[]){
 	uniform_real_distribution<double> dist( -rnd_limit, rnd_limit ); 
 
 	//cout << "initial weigths\n";
-
 	
 	for (int i = 0; i < W.size() ; ++i){
 		for(int j = 0 ; j < W[0].size() ; j++){
@@ -346,9 +348,10 @@ int main(int argc, char const *argv[]){
 	 		W = upd_W;
 
 	 	}
+	 	
 		iter++;
 
-		cout << 100 - total_error/pattern_aug.size() << "\n";
+		cout << 100 - total_error/pattern.size() << "\n";
 
 		total_error = 0;
 	}
