@@ -168,7 +168,7 @@ int main(int argc, char const *argv[]){
 	int D = params[1] - params[2];
 	int O = params[2];
 
-	double n = 0.25;
+	double n = 0.025;
 
 	double sum = 0.0;
 
@@ -222,7 +222,7 @@ int main(int argc, char const *argv[]){
 		cout << "Iteration " << iter << "\t";
 
 	 	for (int i = 0; i < nro_pattern; ++i){
-	 		cout << "pattern " << i << endl;
+	 		//cout << "pattern " << i << endl;
 
 	 		//to manage indexes properly
 	 		int i_w = 0;
@@ -270,7 +270,7 @@ int main(int argc, char const *argv[]){
 	 			//total_error += error2( pattern[i][k], activator(f_y[i_o]));
 	 			total_error += error2( pattern[i][k], f_y[i_o]);
 
-	 			cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << endl;
+	 			//cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << endl;
 
 	 			//cout << total_error << " ";
 	 		}
@@ -297,7 +297,7 @@ int main(int argc, char const *argv[]){
 
 		 			double tmp_y = f_z[i_z];
 
-		 			delta_w = (sig_y - pattern[i][D+i_o]) * sig_y *(1-tanh(y[i_o])*tanh(y[i_o])) * tmp_y ;
+		 			delta_w = (sig_y - pattern[i][D+i_o]) *(1-tanh(y[i_o])*tanh(y[i_o])) * tmp_y ;
 
 		 			upd_W[i_w][1] = W[i_w][1] - n * delta_w;
 
@@ -319,7 +319,7 @@ int main(int argc, char const *argv[]){
 
 	 			for( int idx_o = 0 ; idx_o < O ; idx_o++ ){
 	 				double sig_y = sigmoid(y[idx_o]);
-	 				factor += (sig_y - pattern[i][D+idx_o]) * sig_y * (1-tanh(y[idx_o])*tanh(y[idx_o])) * W[idx_w][1];
+	 				factor += (sig_y - pattern[i][D+idx_o]) * (1-tanh(y[idx_o])*tanh(y[idx_o])) * W[idx_w][1];
 	 				idx_w+=2;
 	 			}
 
@@ -329,7 +329,7 @@ int main(int argc, char const *argv[]){
 
 	 				double sig_z = sigmoid(z[i_z]);
 
-	 				delta_w = factor * sig_z * (1-tanh(z[i_z])*tanh(z[i_z])) * pattern[i][i_x];
+	 				delta_w = factor * (1-tanh(z[i_z])*tanh(z[i_z])) * pattern[i][i_x];
 
 		 			upd_W[i_w][0] = W[i_w][0] - n * delta_w;
 
@@ -338,7 +338,7 @@ int main(int argc, char const *argv[]){
 	 			}
 	 		}
 
-	 		cout << pattern[i][D] << " " << pattern[i][D+1] << " " << pattern[i][D+2] << endl;
+	 		//cout << pattern[i][D] << " " << pattern[i][D+1] << " " << pattern[i][D+2] << endl;
 
 	 		print("\nf_y",f_y);
 
