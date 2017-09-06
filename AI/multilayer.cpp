@@ -80,6 +80,18 @@ void prepare_dataset(vector<vector<double>>& pattern){
 		pattern[i][pattern[0].size()-1] = tmp;
 	}
 
+	//print("pattern\n",pattern);
+
+	/*
+	for( int i = 0 ; i < pattern.size() ; i++ ){
+		for( int j = 1 ; j < pattern[0].size() ; j++ ){
+			cout << pattern[i][j] <<",";
+		} cout << endl;
+	}
+
+	cout << endl;
+	*/
+
 	int nro_class = 3;
 
 	//Adding columns to have a out neuron specialized
@@ -106,14 +118,22 @@ void prepare_dataset(vector<vector<double>>& pattern){
 			pattern_aug[i][pattern[0].size()+1] = 1;
 		}
 	}
+	/*
+	for( int i = 0 ; i < pattern_aug.size() ; i++ ){
+		for( int j = 1 ; j < pattern_aug[0].size() ; j++ ){
+			cout << pattern_aug[i][j] <<",";
+		} cout << endl;
+	}
+
+	cout << endl;
+	*/
 
 	//Getting limits
-
 	vector<pair<double,double>> v_limits;
 
 	for( int j = 0 ; j < (pattern_aug[0].size()-3) ; j++ ){
 		pair<double,double> limits = get_limits(pattern_aug,j);
-		cout << limits.first << "\t" << limits.second << endl;
+		cout << j << " " << limits.first << "\t" << limits.second << endl;
 		v_limits.push_back(limits);
 	}
 
@@ -124,6 +144,15 @@ void prepare_dataset(vector<vector<double>>& pattern){
 			pattern_aug[i][j] = (pattern_aug[i][j] - v_limits[j].first) / ( v_limits[j].second - v_limits[j].first );
 		}
 	}
+	/*
+	for( int i = 0 ; i < pattern_aug.size() ; i++ ){
+		for( int j = 1 ; j < pattern_aug[0].size() ; j++ ){
+			cout << pattern_aug[i][j] <<",";
+		} cout << endl;
+	}
+
+	cout << endl;
+	*/
 
 	pattern = pattern_aug;
 	shuffling_dataset(pattern);
@@ -144,26 +173,12 @@ int main(int argc, char const *argv[]){
 	print("p\n", params);
 	//print("p\n", pattern);
 
-	//AND
-/*	double pattern [4][3] = { 0, 0, 0, 
-						   0, 1, 0, 
-						   1, 0, 0, 
-						   1, 1, 1 };
-*/					
-
-	   
-	//XOR
-	/*double pattern [4][4] = { 0.0, 0.0, 0.0, 0.0,
-						      0.0, 1.0, 1.0, 0.0, 
-						      1.0, 0.0, 0.0, 1.0,
-						      1.0, 1.0, 0.0, 0.0};
-						      */
-
 	prepare_dataset(pattern);
-	
 
 	params[1] = 13 + 3;
 	params[2] = 1 + 2;
+
+	print("P\n", params);
 
 	//print("p\n", pattern);
 
@@ -171,10 +186,7 @@ int main(int argc, char const *argv[]){
 	int D = params[1] - params[2];
 	int O = params[2];
 
-	double n = 0.025;
-
-	double sum = 0.0;
-
+	double n = 0.0025;
 	int maxIter = atoi(argv[1]);
 	int iter = 0;
 
@@ -187,14 +199,11 @@ int main(int argc, char const *argv[]){
 	uniform_real_distribution<double> dist( -rnd_limit, rnd_limit ); 
 
 	//cout << "initial weigths\n";
-	
 	for (int i = 0; i < W.size() ; ++i){
 		for(int j = 0 ; j < W[0].size() ; j++){
 			W[i][j] = dist(rng);
 			//W[i][j] = 0.5;
-			//cout << W[i][j] << "\t";
 		}
-		//cout << endl;
 	}
 	
 
@@ -217,11 +226,14 @@ int main(int argc, char const *argv[]){
 
 	double total_error = 0;
 
+
 	while( iter < maxIter || total_error > max_error ){
+	
+		int precision = 0;
 
 		//n = n / double(iter+1);
 
-		cout << "Iteration " << iter << "\t";
+		cout << "Iteration --> " << iter << "\t";
 
 	 	for (int i = 0; i < nro_pattern; ++i){
 	 		//cout << "pattern " << i << endl;
@@ -274,8 +286,14 @@ int main(int argc, char const *argv[]){
 
 	 			//cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << " " << activator(f_y[i_o]) << endl;
 
-	 			//cout << total_error << " ";
+	 			//cout << total_error << "\n";
 	 		}
+
+	 		if( total_error == 0 ){
+	 			precision++;
+	 		}
+
+
 	 		//cout << total_error << endl;
 
 	 		//Updating W from Z--O
@@ -299,7 +317,7 @@ int main(int argc, char const *argv[]){
 
 		 			double tmp_y = f_z[i_z];
 
-		 			delta_w = (sig_y - pattern[i][D+i_o]) *(1-tanh(y[i_o])*tanh(y[i_o])) * tmp_y ;
+		 			delta_w = (sig_y - pattern[i][D+i_o]) * 1.14393 * (1.0-tanh(y[i_o])*tanh(y[i_o])) * tmp_y ;
 
 		 			upd_W[i_w][1] = W[i_w][1] - n * delta_w;
 
@@ -321,7 +339,7 @@ int main(int argc, char const *argv[]){
 
 	 			for( int idx_o = 0 ; idx_o < O ; idx_o++ ){
 	 				double sig_y = sigmoid(y[idx_o]);
-	 				factor += (sig_y - pattern[i][D+idx_o]) * (1-tanh(y[idx_o])*tanh(y[idx_o])) * W[idx_w][1];
+	 				factor += (sig_y - pattern[i][D+idx_o]) * 1.14393 * (1.0-tanh(y[idx_o])*tanh(y[idx_o])) * W[idx_w][1];
 	 				idx_w+=2;
 	 			}
 
@@ -331,7 +349,7 @@ int main(int argc, char const *argv[]){
 
 	 				double sig_z = sigmoid(z[i_z]);
 
-	 				delta_w = factor * (1-tanh(z[i_z])*tanh(z[i_z])) * pattern[i][i_x];
+	 				delta_w = factor * 1.14393 * (1.0-tanh(z[i_z])*tanh(z[i_z])) * pattern[i][i_x];
 
 		 			upd_W[i_w][0] = W[i_w][0] - n * delta_w;
 
@@ -348,10 +366,11 @@ int main(int argc, char const *argv[]){
 	 		W = upd_W;
 
 	 	}
-	 	
+
 		iter++;
 
-		cout << 100 - total_error/pattern.size() << "\n";
+		cout << total_error << " ";
+		cout << (precision*100.0)/pattern.size() << endl;
 
 		total_error = 0;
 	}
