@@ -148,9 +148,12 @@ void prepare_dataset(vector<vector<double>>& pattern){
 
 	//Normalizing data
 
+	double a = 0.0;
+	double b = 1.0;
+
 	for( int i = 0 ; i < pattern_aug.size() ; i++ ){
 		for( int j = 0 ; j < (pattern_aug[0].size()-3) ; j++ ){
-			pattern_aug[i][j] = (pattern_aug[i][j] - v_limits[j].first) / ( v_limits[j].second - v_limits[j].first );
+			pattern_aug[i][j] = (pattern_aug[i][j] - v_limits[j].first) / ( v_limits[j].second - v_limits[j].first ) * (b-a) + a  ;
 		}
 	}
 	/*
@@ -177,7 +180,9 @@ int main(int argc, char const *argv[]){
 	vector<double> params;
 	vector<vector<double>> pattern;
 
+	cout << "reading\n";
 	reading_params(name,params,pattern);
+	cout << "reading\n";
 
 	print("p\n", params);
 	//print("p\n", pattern);
@@ -196,23 +201,39 @@ int main(int argc, char const *argv[]){
 	int O = params[2];
 
 	double n = 0.0025;
+	double momentum = -0.005;
 	int maxIter = atoi(argv[1]);
 	int iter = 0;
 
 	int n_hidden = D;
 
 	vector<vector<double>> W ( D*n_hidden + 1, vector<double>(2) );
+	vector<vector<double>> W_t ( D*n_hidden + 1, vector<double>(2) );
 
 	default_random_engine rng( random_device{}() ); 
 	double rnd_limit = 4.0 * (sqrt(6)/sqrt(13+3));
 	uniform_real_distribution<double> dist( -rnd_limit, rnd_limit ); 
 
-	//cout << "initial weigths\n";
 	for (int i = 0; i < W.size() ; ++i){
 		for(int j = 0 ; j < W[0].size() ; j++){
-			W[i][j] = dist(rng);
-			//W[i][j] = 0.5;
+			W_t[i][j] = 0;
 		}
+	}
+
+	//cout << "initial weigths\n";
+	//output layer
+	for (int i = 0; i < W.size() ; ++i){
+		//for(int j = 0 ; j < W[0].size() ; j++){
+			//W[i][j] = dist(rng);
+			W[i][1] = dist(rng);
+			//W[i][j] = 0.5;
+		//}
+	}
+
+	//hidden layer
+	for (int i = 0; i < W.size() ; ++i){
+			W[i][0] = dist(rng);
+			//W[i][j] = 0.5;
 	}
 	
 	vector<double> z( n_hidden );
@@ -239,12 +260,12 @@ int main(int argc, char const *argv[]){
 		int precision = 0;
 		//n = n / double(iter+1);
 
-		cout << "Iteration --> " << iter << "\n";
+		cout << "Iteration --> " << iter << " ";
 
 	 	for (int i = 0; i < nro_pattern; ++i){
-	 		cout << "pattern " << i << " ";
+	 		//cout << "pattern " << i << " ";
 
-	 		print( "", pattern[i], 13,16 );
+	 		//print( "", pattern[i], 13,16 );
 
 	 		//to manage indexes properly
 	 		int i_w = 0;
@@ -327,7 +348,7 @@ int main(int argc, char const *argv[]){
 
 		 			delta_w = (sig_y - pattern[i][D+i_o]) * 1.14393 * (1.0-tanh(y[i_o])*tanh(y[i_o])) * tmp_y ;
 
-		 			upd_W[i_w][1] = W[i_w][1] - n * delta_w;
+		 			upd_W[i_w][1] = W[i_w][1] - n * delta_w + momentum * ( W[i_w][1] - W_t[i_w][1] ) ;
 
 	 				i_w++;
 		 		}
@@ -359,7 +380,7 @@ int main(int argc, char const *argv[]){
 
 	 				delta_w = factor * 1.14393 * (1.0-tanh(z[i_z])*tanh(z[i_z])) * pattern[i][i_x];
 
-		 			upd_W[i_w][0] = W[i_w][0] - n * delta_w;
+		 			upd_W[i_w][0] = W[i_w][0] - n * delta_w + momentum * ( W[i_w][0] - W_t[i_w][0] );
 
 		 			i_w++;
 
@@ -372,6 +393,8 @@ int main(int argc, char const *argv[]){
 	 			//print("\nf_y",f_y);
 
 	 		W = upd_W;
+
+	 		W_t = W;
 
 	 	}
 
