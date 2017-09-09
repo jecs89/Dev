@@ -30,6 +30,15 @@ double activator(double val){
 	return ( val > 0 ) ? 1.0:-1.0;
 }
 
+// vector<double> v_activator(vector<double>& val){
+// 	vector<double> _val;
+// 	_val = val;
+// 	for (int i = 0; i < val.size(); ++i){
+// 		_val[i] = ( _val[i] > 0 ) ? 1.0:-1.0;
+// 	}
+// 	return _val;
+// }
+
 vector<double> vsigmoid(vector<double> a){
 	vector<double> y(a.size());
 	for (int i = 0; i < y.size(); ++i){
@@ -206,13 +215,11 @@ int main(int argc, char const *argv[]){
 		}
 	}
 	
-
 	vector<double> z( n_hidden );
 	vector<double> f_z( n_hidden );
 
 	vector<double> y( O );
 	vector<double> f_y( O );
-
 
 	vector<vector<double>> upd_W ( W.size(), vector<double>(2));
 
@@ -230,13 +237,14 @@ int main(int argc, char const *argv[]){
 	while( iter < maxIter || total_error > max_error ){
 	
 		int precision = 0;
-
 		//n = n / double(iter+1);
 
-		cout << "Iteration --> " << iter << "\t";
+		cout << "Iteration --> " << iter << "\n";
 
 	 	for (int i = 0; i < nro_pattern; ++i){
-	 		//cout << "pattern " << i << endl;
+	 		cout << "pattern " << i << " ";
+
+	 		print( "", pattern[i], 13,16 );
 
 	 		//to manage indexes properly
 	 		int i_w = 0;
@@ -276,6 +284,11 @@ int main(int argc, char const *argv[]){
 
 	 		//cout << "Error\n";
 
+	 		//Printing the output layer
+	 		// for (int i = 0; i < f_y.size(); ++i){
+	 		// 	cout << setw(8) << activator(f_y[i]);
+	 		// }
+	 		// cout << endl;
 	 		
 	 		int k;
 
@@ -283,16 +296,13 @@ int main(int argc, char const *argv[]){
 	 		for( int i_o = 0 , k = D ; i_o < y.size() && k < D+O; i_o++, k++){
 	 			total_error += error2( pattern[i][k], activator(f_y[i_o]));
 	 			//total_error += error2( pattern[i][k], f_y[i_o]);
-
 	 			//cout << "error: " << pattern[i][k] << " "<< f_y[i_o] << " " << activator(f_y[i_o]) << endl;
-
 	 			//cout << total_error << "\n";
 	 		}
 
 	 		if( total_error == 0 ){
 	 			precision++;
 	 		}
-
 
 	 		//cout << total_error << endl;
 
@@ -307,9 +317,7 @@ int main(int argc, char const *argv[]){
 	 		//is it limited for hidden neurons????
 	 		// the number of weights is H*O
 			for( int i_o = 0; i_o < y.size() ; i_o++ ){
-
 	 			//cout << "o neuron " << i_o+1 << endl;
-
 		 		double delta_w = 1.0;
 		 		for( int i_z = 0 ; i_z < z.size() ; i_z++ ){
 
