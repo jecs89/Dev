@@ -68,5 +68,4 @@ def dist_euclidiana(x1, x2):
 x1 = [1, 2, 3]
 x2 = [2, 1, 3]
 
-
 print ( dist_euclidiana(x1, x2) )
