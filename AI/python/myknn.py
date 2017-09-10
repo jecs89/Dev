@@ -36,12 +36,22 @@ def info_dataset(amostras, verbose=True):
 p = 0.6
 _, rotulo1, rotulo2 = info_dataset(amostras, verbose=False)
 print( rotulo1 )
+max_rotulo1 = int(p * rotulo1)
+max_rotulo2 = int(p * rotulo2)
+
+num_rotulo1, num_rotulo2 = 0, 0
 
 treinamento, teste = [], []
-for i in range(0,int(rotulo1*p)):
-	treinamento.append( amostras[i] )
-
-for i in range(int(rotulo1*p),int((rotulo1+rotulo2)*p,)):
-	treinamento.append( amostras[i] )
+for amostra in amostras:
+	if( num_rotulo1 < max_rotulo1 and amostra[-1] == 1 ):
+		num_rotulo1 += 1
+		treinamento.append(amostra)
+	elif( num_rotulo2 < max_rotulo2 and amostra[-1] == 2 ):
+		num_rotulo2 += 1
+		treinamento.append(amostra)
+	else:
+		teste.append(amostra)
 
 print( info_dataset(treinamento) )
+
+print( info_dataset(teste) )
