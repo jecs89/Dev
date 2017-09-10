@@ -56,3 +56,16 @@ for amostra in amostras:
 print( info_dataset(treinamento) )
 
 print( info_dataset(teste) )
+
+import math
+
+def dist_euclidiana(x1, x2):
+	dim, soma = len(x1), 0
+	for i in range(dim-1):
+		soma += math.pow( x1[i] - x2[i], 2 )
+	return math.sqrt(soma)
+
+x1 = [1, 2, 3]
+x2 = [2, 1, 3]
+
+print ( dist_euclidiana(x1, x2) )
