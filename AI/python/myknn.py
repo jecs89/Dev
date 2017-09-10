@@ -62,10 +62,34 @@ import math
 def dist_euclidiana(x1, x2):
 	dim, soma = len(x1), 0
 	for i in range(dim-1):
-		soma += math.pow( x1[i] - x2[i]rmrm, 2 )
+		soma += math.pow( x1[i] - x2[i], 2 )
 	return math.sqrt(soma)
 
+# Teste de dist_euclidiana
 x1 = [1, 2, 3]
 x2 = [2, 1, 3]
 
 print ( dist_euclidiana(x1, x2) )
+
+def myknn(dados, nova_amostra, K):
+	dists, tam_dados = {}, len(dados)
+	for i in range(tam_dados):
+		dists[i] = dist_euclidiana( dados[i], nova_amostra )
+
+	sorted(dists, key=dists.get)[:K]
+
+	qtd_rotulo1, qtd_rotulo2 = 0, 0
+
+	for i in range(len(dists)):
+		if dados[i][-1] == 1:
+			qtd_rotulo1 += 1
+		else:
+			qtd_rotulo2 += 1
+
+	if qtd_rotulo2 < qtd_rotulo1 :
+		return 1
+	else:
+		return 2
+
+print(teste[10])
+print(myknn(treinamento, teste[10], 13))
