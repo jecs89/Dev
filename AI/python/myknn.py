@@ -91,5 +91,5 @@ def myknn(dados, nova_amostra, K):
 	else:
 		return 2
 
-print(teste[10])
-print(myknn(treinamento, teste[10], 13))
+print(teste[0])
+print(myknn(treinamento, teste[0], 13))
