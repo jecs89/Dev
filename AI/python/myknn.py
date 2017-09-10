@@ -43,12 +43,13 @@ num_rotulo1, num_rotulo2 = 0, 0
 
 treinamento, teste = [], []
 for amostra in amostras:
-	if( num_rotulo1 < max_rotulo1 and amostra[-1] == 1 ):
-		num_rotulo1 += 1
-		treinamento.append(amostra)
-	elif( num_rotulo2 < max_rotulo2 and amostra[-1] == 2 ):
-		num_rotulo2 += 1
-		treinamento.append(amostra)
+	if (num_rotulo1 + num_rotulo2) < (max_rotulo1 + max_rotulo2):
+		if amostra[-1] == 1:
+			num_rotulo1 += 1
+			treinamento.append(amostra)
+		else:
+			num_rotulo2 += 1
+			treinamento.append(amostra)
 	else:
 		teste.append(amostra)
 
